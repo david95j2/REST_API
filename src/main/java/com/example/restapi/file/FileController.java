@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 @Controller
 public class FileController {
@@ -37,7 +35,6 @@ public class FileController {
     @GetMapping("/api/pcd/{id}")
     public ResponseEntity<InputStreamResource> getPcd(@PathVariable("id") int id) throws IOException {
         Resource file = fileService.getPcd(id);
-
         String fileName = file.getFilename();
 
         // Assume that the file extension is everything after the last dot

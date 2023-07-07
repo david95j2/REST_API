@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -51,15 +54,13 @@ public class FileService {
         return new BaseResponse(ErrorCode.SUCCESS, imageRepository.findAllByPcdEntityId(id));
     }
 
-
     public ResponseEntity getImgJson(int id, int img_id) {
         ImageEntity imageEntity = imageRepository.findByIdAndPcdEntityId(img_id, id).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOT_FOUND)
         );
 
         return new ResponseEntity(
-                new BaseResponse(ErrorCode.SUCCESS,new GetFileRes(imageEntity.getImg_name(),imageEntity.getImg_type(),
-                        imageEntity.getPcdEntity().getPcd_location(),imageEntity.getImg_regdate()))
+                new BaseResponse(ErrorCode.SUCCESS,imageEntity.toGetImageRes())
                 ,ErrorCode.SUCCESS.getStatus());
     }
 
