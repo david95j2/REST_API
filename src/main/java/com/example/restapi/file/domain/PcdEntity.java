@@ -15,13 +15,29 @@ public class PcdEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
-    private String pcd_path;
-    private String pcd_name;
-    private String pcd_type;
-    private String pcd_location;
-    private String pcd_regdate;
+    @Column(name = "pcd_path")
+    private String pcdPath;
+    @Column(name = "pcd_name")
+    private String pcdName;
+    @Column(name = "pcd_type")
+    private String pcdType;
+    @Column(name = "pcd_location")
+    private String pcdLocation;
+    @Column(name = "pcd_regdate")
+    private String pcdRegdate;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity userEntity;
+
+    public GetFileRes toGetFileRes() {
+        GetFileRes getFileRes = new GetFileRes();
+        getFileRes.setFile_name(this.pcdName);
+        getFileRes.setFile_type(this.pcdType);
+        getFileRes.setFile_location(this.pcdLocation);
+        getFileRes.setFile_regdate(this.pcdRegdate);
+        getFileRes.setUser_loginId(this.userEntity.getLoginId());
+
+        return getFileRes;
+    }
 }

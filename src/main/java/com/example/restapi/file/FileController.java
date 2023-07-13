@@ -1,15 +1,15 @@
 package com.example.restapi.file;
 
 import com.example.restapi.exception.BaseResponse;
+import com.example.restapi.file.domain.GetLoginIdReq;
+import jakarta.validation.Valid;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -22,42 +22,21 @@ public class FileController {
         this.fileService = fileService;
     }
 
-    @GetMapping("/api/pcds")
+    @PostMapping("/api/pcds")
     @ResponseBody
-    public BaseResponse getPcdList() {
-        return fileService.getPcdList();
+    public BaseResponse getPcdList(@Valid @RequestBody GetLoginIdReq getLoginIdReq) {
+        return fileService.getPcdList(getLoginIdReq);
     }
 
-    @GetMapping("/api/pcd/{id}/json")
+    @PostMapping("/api/pcd/{id}/json")
     @ResponseBody
-    public ResponseEntity getPcdJson(@PathVariable("id") int id) {return fileService.getPcdJson(id);}
+    public ResponseEntity getPcdJson(@PathVariable("id") int id, @Valid @RequestBody GetLoginIdReq getLoginIdReq) {return fileService.getPcdJson(id, getLoginIdReq);}
 
-    @GetMapping("/api/pcd/{id}")
+
+    @PostMapping("/api/pcd/{id}")
     public ResponseEntity<InputStreamResource> getPcd(@PathVariable("id") int id) throws IOException {
         Resource file = fileService.getPcd(id);
-        String fileName = file.getFilename();
-
-        // Assume that the file extension is everything after the last dot
-        String fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
-
-        String mediaType = getMediaTypeForExtension(fileExtension);
-        if (mediaType == null) {
-            throw new RuntimeException("Could not determine file type.");
-        }
-
-        try {
-            InputStreamResource resource = new InputStreamResource(new FileInputStream(file.getFile()));
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
-
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .contentType(MediaType.parseMediaType(mediaType))
-                    .body(resource);
-        } catch (IOException e) {
-            throw new RuntimeException("Error while loading file " + fileName, e);
-        }
+        return getFile(file);
     }
 
 
@@ -75,9 +54,28 @@ public class FileController {
 
     @GetMapping("/api/pcd/{pcd_id}/image/{img_id}")
     public ResponseEntity getImage(@PathVariable("pcd_id") int id,
-                                                        @PathVariable("img_id") int img_id) throws IOException {
+                                   @PathVariable("img_id") int img_id) throws IOException {
         Resource file = fileService.getImg(id, img_id);
+        return getFile(file);
+    }
 
+    private String getMediaTypeForExtension(String extension) {
+        switch (extension.toLowerCase()) {
+            case "jpeg":
+            case "jpg":
+                return "image/jpeg";
+            case "png":
+                return "image/png";
+            case "gif":
+                return "image/gif";
+            case "pcd":
+                return "application/octet-stream";
+            default:
+                return null;
+        }
+    }
+
+    private ResponseEntity getFile(Resource file) {
         String fileName = file.getFilename();
 
         // Assume that the file extension is everything after the last dot
@@ -100,22 +98,6 @@ public class FileController {
                     .body(resource);
         } catch (IOException e) {
             throw new RuntimeException("Error while loading file " + fileName, e);
-        }
-    }
-
-    private String getMediaTypeForExtension(String extension) {
-        switch (extension.toLowerCase()) {
-            case "jpeg":
-            case "jpg":
-                return "image/jpeg";
-            case "png":
-                return "image/png";
-            case "gif":
-                return "image/gif";
-            case "pcd":
-                return "application/octet-stream";
-            default:
-                return null;
         }
     }
 }

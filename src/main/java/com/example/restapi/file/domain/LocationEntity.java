@@ -14,9 +14,12 @@ public class LocationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Float pos_x;
-    private Float pos_y;
-    private Float pos_z;
+    @Column(name = "pos_x")
+    private Float posX;
+    @Column(name = "pos_y")
+    private Float posY;
+    @Column(name = "pos_z")
+    private Float posZ;
     private Float roll;
     private Float pitch;
     private Float yaw;

@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "images")
+@Table(name = "image")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -16,10 +16,14 @@ public class ImageEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
-    private String img_path;
-    private String img_name;
-    private String img_type;
-    private String img_regdate;
+    @Column(name = "img_path")
+    private String imgPath;
+    @Column(name = "img_name")
+    private String imgName;
+    @Column(name = "img_type")
+    private String imgType;
+    @Column(name = "img_regdate")
+    private String imgRegdate;
 
 
     @ManyToOne
@@ -32,15 +36,15 @@ public class ImageEntity {
 
     public GetImageRes toGetImageRes() {
         GetImageRes dto = new GetImageRes();
-        dto.setFile_name(this.img_name);
-        dto.setFile_type(this.img_type);
-        dto.setFile_location(this.pcdEntity.getPcd_location()); // Assuming this is the location
-        dto.setFile_regdate(this.img_regdate);
+        dto.setFile_name(this.imgName);
+        dto.setFile_type(this.imgType);
+        dto.setFile_location(this.pcdEntity.getPcdLocation()); // Assuming this is the location
+        dto.setFile_regdate(this.imgRegdate);
 
         if(this.locationEntity != null) { // Assuming locationEntity could be null
-            dto.setPos_x(this.locationEntity.getPos_x());
-            dto.setPos_y(this.locationEntity.getPos_y());
-            dto.setPos_z(this.locationEntity.getPos_z());
+            dto.setPos_x(this.locationEntity.getPosX());
+            dto.setPos_y(this.locationEntity.getPosY());
+            dto.setPos_z(this.locationEntity.getPosZ());
             dto.setRoll(this.locationEntity.getRoll());
             dto.setPitch(this.locationEntity.getPitch());
             dto.setYaw(this.locationEntity.getYaw());

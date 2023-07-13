@@ -3,7 +3,7 @@ package com.example.restapi.file;
 import com.example.restapi.exception.AppException;
 import com.example.restapi.exception.BaseResponse;
 import com.example.restapi.exception.ErrorCode;
-import com.example.restapi.file.domain.GetFileRes;
+import com.example.restapi.file.domain.GetLoginIdReq;
 import com.example.restapi.file.domain.ImageEntity;
 import com.example.restapi.file.domain.PcdEntity;
 import jakarta.transaction.Transactional;
@@ -16,9 +16,6 @@ import org.springframework.stereotype.Service;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -27,18 +24,19 @@ public class FileService {
     private final PcdRepository pcdRepository;
     private final ImageRepository imageRepository;
 
-    public BaseResponse getPcdList() {
-        return new BaseResponse(ErrorCode.SUCCESS, pcdRepository.findAll());
+    // 해당 유저의 한에 전체 pcd 리스트 불러오기 -> O
+    public BaseResponse getPcdList(GetLoginIdReq getLoginIdReq) {
+        return new BaseResponse(ErrorCode.SUCCESS,pcdRepository.findAllByUserEntity_LoginId(getLoginIdReq.getLogin_id()));
     }
 
-    public ResponseEntity getPcdJson(Integer id) {
-        PcdEntity pcdEntity = pcdRepository.findById(id).orElseThrow(
+
+    public ResponseEntity getPcdJson(int id, GetLoginIdReq getLoginIdReq) {
+        PcdEntity pcdEntity = pcdRepository.findByIdAndUserEntityLoginId(id, getLoginIdReq.getLogin_id()).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOT_FOUND)
         );
 
         return new ResponseEntity(
-                new BaseResponse(ErrorCode.SUCCESS,new GetFileRes(pcdEntity.getPcd_name(),pcdEntity.getPcd_type(),
-                        pcdEntity.getPcd_location(), pcdEntity.getPcd_regdate()))
+                new BaseResponse(ErrorCode.SUCCESS,pcdEntity.toGetFileRes())
                 ,ErrorCode.SUCCESS.getStatus());
     }
 
@@ -47,7 +45,7 @@ public class FileService {
                 () -> new AppException(ErrorCode.DATA_NOT_FOUND)
         );
 
-        return loadFileAsResource(pcdEntity.getPcd_path(),pcdEntity.getPcd_name()+pcdEntity.getPcd_type());
+        return loadFileAsResource(pcdEntity.getPcdPath(),pcdEntity.getPcdName()+pcdEntity.getPcdType());
     }
 
     public BaseResponse getImgList(int id) {
@@ -69,7 +67,7 @@ public class FileService {
                 () -> new AppException(ErrorCode.DATA_NOT_FOUND)
         );
 
-        return loadFileAsResource(imageEntity.getImg_path(),imageEntity.getImg_name()+imageEntity.getImg_type());
+        return loadFileAsResource(imageEntity.getImgPath(),imageEntity.getImgName()+imageEntity.getImgType());
     }
 
     public Resource loadFileAsResource(String filePath, String fileName) {
