@@ -4,6 +4,7 @@ import com.example.restapi.exception.BaseResponse;
 import com.example.restapi.file.domain.GetLoginIdReq;
 import com.example.restapi.user.UserService;
 import jakarta.validation.Valid;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -12,8 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 @Controller
 public class FileController {
@@ -32,7 +35,7 @@ public class FileController {
         return fileService.getPcdList(login_id);
     }
 
-    @GetMapping("/api/{login_id}/pcd/{id}/json")
+    @GetMapping("/api/{login_id}/pcd/{id}/info")
     @ResponseBody
     public ResponseEntity getPcdJson(
             @PathVariable("login_id") String login_id,@PathVariable("id") Integer id) {
@@ -57,7 +60,7 @@ public class FileController {
         return fileService.getImgList(id, login_id);
     }
 
-    @GetMapping("/api/{login_id}/pcd/{pcd_id}/image/{img_id}/json")
+    @GetMapping("/api/{login_id}/pcd/{pcd_id}/image/{img_id}/info")
     @ResponseBody
     public ResponseEntity getImageJson(@PathVariable("login_id") String login_id,
             @PathVariable("pcd_id") Integer pcd_id, @PathVariable("img_id") Integer img_id) {
@@ -70,7 +73,16 @@ public class FileController {
                                     @PathVariable("pcd_id") int id,
                                    @PathVariable("img_id") int img_id) throws IOException {
         Resource file = fileService.getImg(id, img_id, login_id);
-        return getFile(file);
+        return getFile(file, false);
+    }
+
+    @GetMapping("/api/{login_id}/pcd/{pcd_id}/image/{img_id}/sample")
+    public ResponseEntity getSampleImage(@PathVariable("login_id") String login_id,
+                                   @PathVariable("pcd_id") int id,
+                                   @PathVariable("img_id") int img_id) throws IOException {
+        Resource file = fileService.getImg(id, img_id, login_id);
+
+        return getFile(file, true);
     }
 
     private String getMediaTypeForExtension(String extension) {
@@ -89,7 +101,7 @@ public class FileController {
         }
     }
 
-    private ResponseEntity getFile(Resource file) {
+    private ResponseEntity getFile(Resource file, Boolean isSample) {
         String fileName = file.getFilename();
 
         // Assume that the file extension is everything after the last dot
@@ -101,7 +113,20 @@ public class FileController {
         }
 
         try {
-            InputStreamResource resource = new InputStreamResource(new FileInputStream(file.getFile()));
+            InputStreamResource resource;
+            if (isSample) {
+                // Create a temporary file to store the thumbnail
+                File thumbnail = File.createTempFile("thumbnail", "." + fileExtension);
+                try (InputStream in = new FileInputStream(file.getFile())) {
+                    // Use Thumbnailator to create the thumbnail
+                    Thumbnails.of(in)
+                            .size(320, 200)  // Set the dimensions of the thumbnail. Adjust as needed.
+                            .toFile(thumbnail);
+                }
+                resource = new InputStreamResource(new FileInputStream(thumbnail));
+            } else {
+                resource = new InputStreamResource(new FileInputStream(file.getFile()));
+            }
 
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
