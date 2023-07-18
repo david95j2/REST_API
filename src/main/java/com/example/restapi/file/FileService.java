@@ -3,9 +3,7 @@ package com.example.restapi.file;
 import com.example.restapi.exception.AppException;
 import com.example.restapi.exception.BaseResponse;
 import com.example.restapi.exception.ErrorCode;
-import com.example.restapi.file.domain.GetLoginIdReq;
-import com.example.restapi.file.domain.ImageEntity;
-import com.example.restapi.file.domain.PcdEntity;
+import com.example.restapi.file.domain.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -21,49 +19,48 @@ import java.nio.file.Paths;
 @RequiredArgsConstructor
 @Transactional
 public class FileService {
-    private final PcdRepository pcdRepository;
+    private final MapRepository mapRepository;
     private final ImageRepository imageRepository;
 
     // 해당 유저의 한에 전체 pcd 리스트 불러오기 -> O
-    public BaseResponse getPcdList(GetLoginIdReq getLoginIdReq) {
-        return new BaseResponse(ErrorCode.SUCCESS,pcdRepository.findAllByUserEntity_LoginId(getLoginIdReq.getLogin_id()));
+    public BaseResponse getPcdList(String login_id) {
+        return new BaseResponse(ErrorCode.SUCCESS, mapRepository.findAllByUserEntity_LoginId(login_id));
     }
 
 
-    public ResponseEntity getPcdJson(int id, GetLoginIdReq getLoginIdReq) {
-        PcdEntity pcdEntity = pcdRepository.findByIdAndUserEntityLoginId(id, getLoginIdReq.getLogin_id()).orElseThrow(
-                () -> new AppException(ErrorCode.DATA_NOT_FOUND)
-        );
+    public ResponseEntity getPcdJson(Integer id, String login_id) {
+        MapEntity mapEntity = mapRepository.findByIdAndUserEntityLoginId(id, login_id).orElseThrow(
+                () -> new AppException(ErrorCode.DATA_NOT_FOUND));
 
         return new ResponseEntity(
-                new BaseResponse(ErrorCode.SUCCESS,pcdEntity.toGetFileRes())
+                new BaseResponse(ErrorCode.SUCCESS, mapEntity.toGetFileRes())
                 ,ErrorCode.SUCCESS.getStatus());
     }
 
-    public Resource getPcd(Integer id) {
-        PcdEntity pcdEntity = pcdRepository.findById(id).orElseThrow(
+    public Resource getPcd(Integer id, String login_id) {
+        MapEntity mapEntity = mapRepository.findByIdAndUserEntityLoginId(id, login_id).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOT_FOUND)
         );
 
-        return loadFileAsResource(pcdEntity.getPcdPath(),pcdEntity.getPcdName()+pcdEntity.getPcdType());
+        return loadFileAsResource(mapEntity.getMapPath(), mapEntity.getMapName()+ mapEntity.getMapType());
     }
 
-    public BaseResponse getImgList(int id) {
-        return new BaseResponse(ErrorCode.SUCCESS, imageRepository.findAllByPcdEntityId(id));
+    public BaseResponse getImgList(Integer id, String login_id) {
+        return new BaseResponse(ErrorCode.SUCCESS,
+                imageRepository.findAllByMapIdAndLoginId(id, login_id));
     }
 
-    public ResponseEntity getImgJson(int id, int img_id) {
-        ImageEntity imageEntity = imageRepository.findByIdAndPcdEntityId(img_id, id).orElseThrow(
-                () -> new AppException(ErrorCode.DATA_NOT_FOUND)
-        );
+    public ResponseEntity getImgJson(Integer id, Integer img_id, String login_id) {
+        GetImageMapping getImageMapping = imageRepository.findByIdAndMapIdAndLoginId(img_id, id, login_id).orElseThrow(
+                () -> new AppException(ErrorCode.DATA_NOT_FOUND));
 
         return new ResponseEntity(
-                new BaseResponse(ErrorCode.SUCCESS,imageEntity.toGetImageRes())
+                new BaseResponse(ErrorCode.SUCCESS,getImageMapping)
                 ,ErrorCode.SUCCESS.getStatus());
     }
 
-    public Resource getImg(int id, int img_id) {
-        ImageEntity imageEntity = imageRepository.findByIdAndPcdEntityId(img_id,id).orElseThrow(
+    public Resource getImg(Integer id, Integer img_id, String login_id) {
+        ImageEntity imageEntity = imageRepository.findByIdAndMapIdAndLoginId(img_id,id,login_id).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOT_FOUND)
         );
 

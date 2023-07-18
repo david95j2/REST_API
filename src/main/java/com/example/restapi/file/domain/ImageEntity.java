@@ -1,6 +1,8 @@
 package com.example.restapi.file.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,15 +24,16 @@ public class ImageEntity {
     private String imgName;
     @Column(name = "img_type")
     private String imgType;
-    @Column(name = "img_regdate")
-    private String imgRegdate;
+    @Column(name = "regdate")
+    private String regdate;
 
 
+    @JsonBackReference
     @ManyToOne
-    @JoinColumn(name = "pcd_id")
-    private PcdEntity pcdEntity;
+    @JoinColumn(name = "img_group_id")
+    private ImageGroupEntity imageGroupEntity;
 
-    @JsonIgnore
+    @JsonManagedReference
     @OneToOne(mappedBy = "imageEntity")
     private LocationEntity locationEntity;
 
@@ -38,8 +41,8 @@ public class ImageEntity {
         GetImageRes dto = new GetImageRes();
         dto.setFile_name(this.imgName);
         dto.setFile_type(this.imgType);
-        dto.setFile_location(this.pcdEntity.getPcdLocation()); // Assuming this is the location
-        dto.setFile_regdate(this.imgRegdate);
+        dto.setFile_location(this.imageGroupEntity.getMapEntity().getMapInfoEntity().getLocation()); // Assuming this is the location
+        dto.setFile_regdate(this.regdate);
 
         if(this.locationEntity != null) { // Assuming locationEntity could be null
             dto.setPos_x(this.locationEntity.getPosX());

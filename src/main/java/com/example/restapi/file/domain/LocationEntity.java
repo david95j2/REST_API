@@ -1,12 +1,13 @@
 package com.example.restapi.file.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.stereotype.Service;
 
 @Entity
 @Getter @Setter
-@Table(name = "location")
+@Table(name = "image_location")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
@@ -24,6 +25,7 @@ public class LocationEntity {
     private Float pitch;
     private Float yaw;
 
+    @JsonBackReference
     @OneToOne
     @JoinColumn(name = "img_id")
     private ImageEntity imageEntity;

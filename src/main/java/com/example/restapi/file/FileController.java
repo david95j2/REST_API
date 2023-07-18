@@ -2,6 +2,7 @@ package com.example.restapi.file;
 
 import com.example.restapi.exception.BaseResponse;
 import com.example.restapi.file.domain.GetLoginIdReq;
+import com.example.restapi.user.UserService;
 import jakarta.validation.Valid;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -17,45 +18,58 @@ import java.io.IOException;
 @Controller
 public class FileController {
     private final FileService fileService;
+    private final UserService userService;
 
-    public FileController(FileService fileService) {
+    public FileController(FileService fileService, UserService userService) {
         this.fileService = fileService;
+        this.userService = userService;
     }
 
-    @PostMapping("/api/pcds")
+    @GetMapping("/api/{login_id}/pcds")
     @ResponseBody
-    public BaseResponse getPcdList(@Valid @RequestBody GetLoginIdReq getLoginIdReq) {
-        return fileService.getPcdList(getLoginIdReq);
+    public BaseResponse getPcdList(@PathVariable String login_id) {
+        userService.getUserByLoginId(login_id);
+        return fileService.getPcdList(login_id);
     }
 
-    @PostMapping("/api/pcd/{id}/json")
+    @GetMapping("/api/{login_id}/pcd/{id}/json")
     @ResponseBody
-    public ResponseEntity getPcdJson(@PathVariable("id") int id, @Valid @RequestBody GetLoginIdReq getLoginIdReq) {return fileService.getPcdJson(id, getLoginIdReq);}
+    public ResponseEntity getPcdJson(
+            @PathVariable("login_id") String login_id,@PathVariable("id") Integer id) {
+        userService.getUserByLoginId(login_id);
+        return fileService.getPcdJson(id, login_id);
+    }
 
 
-    @PostMapping("/api/pcd/{id}")
-    public ResponseEntity<InputStreamResource> getPcd(@PathVariable("id") int id) throws IOException {
-        Resource file = fileService.getPcd(id);
+    @GetMapping("/api/{login_id}/pcd/{id}")
+    public ResponseEntity<InputStreamResource> getPcd(
+            @PathVariable("login_id") String login_id,@PathVariable("id") Integer id) throws IOException {
+        userService.getUserByLoginId(login_id);
+        Resource file = fileService.getPcd(id, login_id);
         return getFile(file);
     }
 
 
-    @GetMapping("/api/pcd/{img_id}/images")
+    @GetMapping("/api/{login_id}/pcd/{id}/images")
     @ResponseBody
-    public BaseResponse getImageList(@PathVariable("img_id") int id) {
-        return fileService.getImgList(id);
+    public BaseResponse getImageList(@PathVariable("login_id") String login_id,@PathVariable("id") Integer id) {
+        userService.getUserByLoginId(login_id);
+        return fileService.getImgList(id, login_id);
     }
 
-    @GetMapping("/api/pcd/{pcd_id}/image/{img_id}/json")
+    @GetMapping("/api/{login_id}/pcd/{pcd_id}/image/{img_id}/json")
     @ResponseBody
-    public ResponseEntity getImageJson(@PathVariable("pcd_id") int id, @PathVariable("img_id") int img_id) {
-        return fileService.getImgJson(id, img_id);
+    public ResponseEntity getImageJson(@PathVariable("login_id") String login_id,
+            @PathVariable("pcd_id") Integer pcd_id, @PathVariable("img_id") Integer img_id) {
+        userService.getUserByLoginId(login_id);
+        return fileService.getImgJson(pcd_id, img_id, login_id);
     }
 
     @GetMapping("/api/pcd/{pcd_id}/image/{img_id}")
-    public ResponseEntity getImage(@PathVariable("pcd_id") int id,
+    public ResponseEntity getImage(@PathVariable("login_id") String login_id,
+                                    @PathVariable("pcd_id") int id,
                                    @PathVariable("img_id") int img_id) throws IOException {
-        Resource file = fileService.getImg(id, img_id);
+        Resource file = fileService.getImg(id, img_id, login_id);
         return getFile(file);
     }
 

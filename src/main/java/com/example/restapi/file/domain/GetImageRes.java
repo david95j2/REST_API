@@ -13,10 +13,10 @@ public class GetImageRes {
     private String file_type;
     private String file_location;
     private String file_regdate;
-    private float pos_x;
-    private float pos_y;
-    private float pos_z;
-    private float roll;
-    private float pitch;
-    private float yaw;
+    private Float pos_x;
+    private Float pos_y;
+    private Float pos_z;
+    private Float roll;
+    private Float pitch;
+    private Float yaw;
 }
