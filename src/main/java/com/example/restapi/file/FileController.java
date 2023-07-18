@@ -65,7 +65,7 @@ public class FileController {
         return fileService.getImgJson(pcd_id, img_id, login_id);
     }
 
-    @GetMapping("/api/pcd/{pcd_id}/image/{img_id}")
+    @GetMapping("/api/{login_id}/pcd/{pcd_id}/image/{img_id}")
     public ResponseEntity getImage(@PathVariable("login_id") String login_id,
                                     @PathVariable("pcd_id") int id,
                                    @PathVariable("img_id") int img_id) throws IOException {

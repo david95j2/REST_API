@@ -60,7 +60,7 @@ public class FileService {
     }
 
     public Resource getImg(Integer id, Integer img_id, String login_id) {
-        ImageEntity imageEntity = imageRepository.findByIdAndMapIdAndLoginId(img_id,id,login_id).orElseThrow(
+        ImageEntity imageEntity = imageRepository.findPathByIdAndMapIdAndLoginId(img_id,id,login_id).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOT_FOUND)
         );
 
