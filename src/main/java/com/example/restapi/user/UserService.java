@@ -27,10 +27,11 @@ public class UserService {
         return RandomStringUtils.randomAlphanumeric(15);
     }
 
-    public void getUserByLoginId(String login_id) {
-        userRepository.findByLoginId(login_id).orElseThrow(
+    public Integer getUserByLoginId(String login_id) {
+        UserEntity userEntity = userRepository.findByLoginId(login_id).orElseThrow(
                 () -> new AppException(ErrorCode.NOT_FOUND)
         );
+        return userEntity.getId();
     }
 
     public BaseResponse getUser(int id) {

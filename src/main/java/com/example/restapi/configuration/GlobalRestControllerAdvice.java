@@ -32,13 +32,13 @@ public class GlobalRestControllerAdvice {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> methodValidException(MethodArgumentNotValidException e){
         log.error("Error occurs : {}",e.toString());
-        HashMap<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("errorCode", ErrorCode.INCORRECT.getStatus());
-        errorResponse.put("status",ErrorCode.INCORRECT.getStatus().value());
+        HashMap<String, Object> errorResponse = new HashMap<>(); // HttpStatus.METHOD_NOT_ALLOWED
+        errorResponse.put("errorCode", ErrorCode.METHOD_NOT_ALLOWED.getStatus());
+        errorResponse.put("status",ErrorCode.METHOD_NOT_ALLOWED.getStatus().value());
         errorResponse.put("message",e.getBindingResult().getFieldError().getDefaultMessage());
 
         return ResponseEntity
-                .status(ErrorCode.INCORRECT.getStatus())
+                .status(ErrorCode.METHOD_NOT_ALLOWED.getStatus())
                 .body(errorResponse);
     }
 }
