@@ -1,5 +1,7 @@
-package com.example.restapi.exception;
+package com.example.restapi.configuration;
 
+import com.example.restapi.exception.AppException;
+import com.example.restapi.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -31,7 +33,7 @@ public class GlobalRestControllerAdvice {
     public ResponseEntity<?> methodValidException(MethodArgumentNotValidException e){
         log.error("Error occurs : {}",e.toString());
         HashMap<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("errorCode",ErrorCode.INCORRECT.getStatus());
+        errorResponse.put("errorCode", ErrorCode.INCORRECT.getStatus());
         errorResponse.put("status",ErrorCode.INCORRECT.getStatus().value());
         errorResponse.put("message",e.getBindingResult().getFieldError().getDefaultMessage());
 

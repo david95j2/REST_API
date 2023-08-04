@@ -2,8 +2,10 @@ package com.example.restapi.file.domain;
 
 public interface GetMapInfoMapping {
     Integer getId();
-    String getUserEntityLoginId();
-    String getMapName();
-    String getMapInfoEntityLocation();
-    String getMapInfoEntityFileRegdate();
+    String getFileName();
+    String getLocation();
+    Float getLatitude();
+    Float getLongitude();
+    String getRegdate();
+
 }

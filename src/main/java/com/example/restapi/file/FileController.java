@@ -1,10 +1,14 @@
 package com.example.restapi.file;
 
 import com.example.restapi.exception.BaseResponse;
+import com.example.restapi.exception.ErrorCode;
 import com.example.restapi.file.domain.GetLoginIdReq;
 import com.example.restapi.user.UserService;
 import jakarta.validation.Valid;
+import jep.Jep;
+import jep.JepConfig;
 import net.coobird.thumbnailator.Thumbnails;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +32,13 @@ public class FileController {
         this.userService = userService;
     }
 
+    @GetMapping("/api/jep_test")
+    @ResponseBody
+    public String jepTest() {
+        fileService.JepTest();
+        return "Success !";
+    }
+
     @GetMapping("/api/{login_id}/pcds")
     @ResponseBody
     public BaseResponse getPcdList(@PathVariable String login_id) {
@@ -49,15 +60,31 @@ public class FileController {
             @PathVariable("login_id") String login_id,@PathVariable("id") Integer id) throws IOException {
         userService.getUserByLoginId(login_id);
         Resource file = fileService.getPcd(id, login_id);
-        return getFile(file);
+        return getFile(file, false);
     }
 
+    @GetMapping("/api/{login_id}/pcd/{id}/sample")
+    public ResponseEntity<InputStreamResource> getPcdSample(
+            @PathVariable("login_id") String login_id,@PathVariable("id") Integer id) throws IOException {
+        userService.getUserByLoginId(login_id);
+        Resource file = fileService.getPcdSample(id, login_id);
+        return getFile(file, true);
+    }
 
     @GetMapping("/api/{login_id}/pcd/{id}/images")
     @ResponseBody
     public BaseResponse getImageList(@PathVariable("login_id") String login_id,@PathVariable("id") Integer id) {
         userService.getUserByLoginId(login_id);
         return fileService.getImgList(id, login_id);
+    }
+
+    @GetMapping("/api/{login_id}/pcd/{id}/images/{group_id}")
+    @ResponseBody
+    public BaseResponse getGroupImageList(
+            @PathVariable("login_id") String login_id,@PathVariable("id") Integer id,
+            @PathVariable("group_id") Integer group_id) {
+        userService.getUserByLoginId(login_id);
+        return fileService.getGroupImgList(id, group_id,login_id);
     }
 
     @GetMapping("/api/{login_id}/pcd/{pcd_id}/image/{img_id}/info")
@@ -101,9 +128,10 @@ public class FileController {
         }
     }
 
-    private ResponseEntity getFile(Resource file, Boolean isSample) {
-        String fileName = file.getFilename();
+    private ResponseEntity getFile(Resource file, Boolean isSample) throws IOException {
 
+        String fileName = file.getFilename();
+//        System.out.println((file.contentLength() / 1024) / 1024 );
         // Assume that the file extension is everything after the last dot
         String fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
 
@@ -113,7 +141,7 @@ public class FileController {
         }
 
         try {
-            InputStreamResource resource;
+            FileSystemResource resource;
             if (isSample) {
                 // Create a temporary file to store the thumbnail
                 File thumbnail = File.createTempFile("thumbnail", "." + fileExtension);
@@ -123,12 +151,13 @@ public class FileController {
                             .size(320, 200)  // Set the dimensions of the thumbnail. Adjust as needed.
                             .toFile(thumbnail);
                 }
-                resource = new InputStreamResource(new FileInputStream(thumbnail));
+                resource = new FileSystemResource(thumbnail);
             } else {
-                resource = new InputStreamResource(new FileInputStream(file.getFile()));
+                resource = new FileSystemResource(file.getFile());
             }
 
             HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(resource.contentLength()));
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
 
             return ResponseEntity.ok()

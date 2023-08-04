@@ -1,4 +1,4 @@
-package com.example.restapi.exception;
+package com.example.restapi.configuration;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

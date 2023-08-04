@@ -6,24 +6,22 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "map_info")
-@Getter @Setter
+@Table(name = "map_group")
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
-public class MapInfoEntity {
+public class MapGroupEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
     private String location;
-    @Column(name = "file_regdate")
-    private String fileRegdate;
-    private String structure;
-    private Integer distance;
+    private Float latitude;
+    private Float longitude;
 
     @JsonBackReference
-    @OneToOne
-    @JoinColumn(name = "map_id")
-    private MapEntity mapEntity;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity userEntity;
 }
