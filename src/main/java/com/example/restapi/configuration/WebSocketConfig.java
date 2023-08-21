@@ -1,6 +1,7 @@
 package com.example.restapi.configuration;
 
 import com.example.restapi.websocket.MyWebSocketHandler;
+import com.example.restapi.websocket.UserIdHandshakeInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -16,7 +17,11 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(chatHandler, "test").setAllowedOrigins("*");
-        registry.addHandler(broadcastHandler, "test/monitoring").setAllowedOrigins("*");
+        registry.addHandler(chatHandler, "/{login_id}/internal/proc")
+                .addInterceptors(new UserIdHandshakeInterceptor()) // 인터셉터 추가
+                .setAllowedOrigins("*");
+        registry.addHandler(broadcastHandler, "/{login_id}/internal/proc/monitoring")
+                .addInterceptors(new UserIdHandshakeInterceptor()) // 인터셉터 추가
+                .setAllowedOrigins("*");
     }
 }
