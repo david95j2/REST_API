@@ -12,7 +12,7 @@ public class MyConfiguration implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")  // 모든 요청 경로에 대해
-                .allowedOrigins("http://221.162.229.60:30003", "http://192.168.0.160:30003")
+                .allowedOrigins("http://211.224.129.230:30003", "http://192.168.0.160:30003")
                 .allowedMethods(ALLOWED_METHOD_NAMES.split(","));  // 허용하려는 도메인을 설정
     }
 }
