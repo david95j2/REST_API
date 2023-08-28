@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.session.StandardSession;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -23,7 +24,7 @@ import java.util.Map;
 
 
 @Component
-@Log4j2
+@Slf4j
 public class MyWebSocketHandler extends TextWebSocketHandler {
     private static List<WebSocketSession> list = new ArrayList<>();
 
@@ -102,7 +103,7 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
             sess.sendMessage(message);
         }
 
-        log.info(session.getUri());
+        log.info(String.valueOf(session.getUri()));
     }
 
     /* Client가 접속 시 호출되는 메서드 */

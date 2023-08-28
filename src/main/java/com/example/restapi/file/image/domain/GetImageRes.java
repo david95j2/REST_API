@@ -1,4 +1,4 @@
-package com.example.restapi.file.domain;
+package com.example.restapi.file.image.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

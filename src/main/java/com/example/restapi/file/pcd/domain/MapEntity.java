@@ -1,8 +1,6 @@
-package com.example.restapi.file.domain;
+package com.example.restapi.file.pcd.domain;
 
-import com.example.restapi.user.domain.UserEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,8 +27,6 @@ public class MapEntity {
     private Integer mapCount;
     @Column(name = "map_area")
     private Integer mapArea;
-    @Column(name = "map_sample_path")
-    private String mapSamplePath;
     @Column(name = "map_regdate")
     private String regdate;
     @Column(name = "last_regdate")

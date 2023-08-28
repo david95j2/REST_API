@@ -1,9 +1,14 @@
-package com.example.restapi.file.domain;
+package com.example.restapi.file.pcd.domain;
 
+import com.example.restapi.file.image.domain.LocationEntity;
 import com.example.restapi.user.domain.UserEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "map_group")
@@ -24,4 +29,9 @@ public class MapGroupEntity {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity userEntity;
+
+    @JsonManagedReference
+    @JsonIgnore
+    @OneToMany(mappedBy = "mapGroupEntity")
+    private List<MapGroupSampleEntity> mapGroupSampleEntity;
 }

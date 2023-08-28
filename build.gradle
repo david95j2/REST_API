@@ -34,14 +34,11 @@ dependencies {
 //    추가
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+//    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.1'    /* thumbnailator */
     implementation 'black.ninia:jep:4.1.1' /* Jep with Python*/
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
-
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
-
-
 }
 
 tasks.named('test') {

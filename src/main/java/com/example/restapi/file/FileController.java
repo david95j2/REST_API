@@ -1,12 +1,10 @@
 package com.example.restapi.file;
 
 import com.example.restapi.exception.BaseResponse;
-import com.example.restapi.exception.ErrorCode;
-import com.example.restapi.file.domain.GetLoginIdReq;
+import com.example.restapi.file.image.ImageService;
+import com.example.restapi.file.pcd.MapService;
 import com.example.restapi.user.UserService;
-import jakarta.validation.Valid;
-import jep.Jep;
-import jep.JepConfig;
+import lombok.AllArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
@@ -23,28 +21,18 @@ import java.io.IOException;
 import java.io.InputStream;
 
 @Controller
+@AllArgsConstructor
 public class FileController {
-    private final FileService fileService;
+    private final MapService mapService;
+    private final ImageService imageService;
     private final UserService userService;
 
-    public FileController(FileService fileService, UserService userService) {
-        this.fileService = fileService;
-        this.userService = userService;
-    }
-
-    @GetMapping("/api/jep_test")
-
-    @ResponseBody
-    public String jepTest() {
-        fileService.JepTest();
-        return "Success !";
-    }
 
     @GetMapping("/api/{login_id}/pcds")
     @ResponseBody
     public BaseResponse getPcdList(@PathVariable String login_id) {
         userService.getUserByLoginId(login_id);
-        return fileService.getPcdList(login_id);
+        return mapService.getPcdList(login_id);
     }
 
     @GetMapping("/api/{login_id}/pcd/{id}/info")
@@ -52,7 +40,7 @@ public class FileController {
     public ResponseEntity getPcdJson(
             @PathVariable("login_id") String login_id,@PathVariable("id") Integer id) {
         userService.getUserByLoginId(login_id);
-        return fileService.getPcdJson(id, login_id);
+        return mapService.getPcdJson(id, login_id);
     }
 
 
@@ -60,7 +48,7 @@ public class FileController {
     public ResponseEntity<InputStreamResource> getPcd(
             @PathVariable("login_id") String login_id,@PathVariable("id") Integer id) throws IOException {
         userService.getUserByLoginId(login_id);
-        Resource file = fileService.getPcd(id, login_id);
+        Resource file = mapService.getPcd(id, login_id);
         return getFile(file, false);
     }
 
@@ -68,7 +56,7 @@ public class FileController {
     public ResponseEntity<InputStreamResource> getPcdSample(
             @PathVariable("login_id") String login_id,@PathVariable("id") Integer id) throws IOException {
         userService.getUserByLoginId(login_id);
-        Resource file = fileService.getPcdSample(id, login_id);
+        Resource file = mapService.getPcdSample(id, login_id);
         return getFile(file, true);
     }
 
@@ -76,7 +64,7 @@ public class FileController {
     @ResponseBody
     public BaseResponse getImageList(@PathVariable("login_id") String login_id,@PathVariable("id") Integer id) {
         userService.getUserByLoginId(login_id);
-        return fileService.getImgList(id, login_id);
+        return imageService.getImgList(id, login_id);
     }
 
     @GetMapping("/api/{login_id}/pcd/{id}/images/{group_id}")
@@ -85,7 +73,7 @@ public class FileController {
             @PathVariable("login_id") String login_id,@PathVariable("id") Integer id,
             @PathVariable("group_id") Integer group_id) {
         userService.getUserByLoginId(login_id);
-        return fileService.getGroupImgList(id, group_id,login_id);
+        return imageService.getGroupImgList(id, group_id,login_id);
     }
 
     @GetMapping("/api/{login_id}/pcd/{pcd_id}/image/{img_id}/info")
@@ -93,14 +81,14 @@ public class FileController {
     public ResponseEntity getImageJson(@PathVariable("login_id") String login_id,
             @PathVariable("pcd_id") Integer pcd_id, @PathVariable("img_id") Integer img_id) {
         userService.getUserByLoginId(login_id);
-        return fileService.getImgJson(pcd_id, img_id, login_id);
+        return imageService.getImgJson(pcd_id, img_id, login_id);
     }
 
     @GetMapping("/api/{login_id}/pcd/{pcd_id}/image/{img_id}")
     public ResponseEntity getImage(@PathVariable("login_id") String login_id,
                                     @PathVariable("pcd_id") int id,
                                    @PathVariable("img_id") int img_id) throws IOException {
-        Resource file = fileService.getImg(id, img_id, login_id);
+        Resource file = imageService.getImg(id, img_id, login_id);
         return getFile(file, false);
     }
 
@@ -108,7 +96,7 @@ public class FileController {
     public ResponseEntity getSampleImage(@PathVariable("login_id") String login_id,
                                    @PathVariable("pcd_id") int id,
                                    @PathVariable("img_id") int img_id) throws IOException {
-        Resource file = fileService.getImg(id, img_id, login_id);
+        Resource file = imageService.getImg(id, img_id, login_id);
 
         return getFile(file, true);
     }

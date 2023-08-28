@@ -1,4 +1,4 @@
-package com.example.restapi.file.domain;
+package com.example.restapi.file.image.domain;
 
 public interface GetImagesMapping {
     Integer getId();

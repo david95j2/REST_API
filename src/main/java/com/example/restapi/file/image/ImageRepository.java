@@ -1,12 +1,14 @@
-package com.example.restapi.file;
+package com.example.restapi.file.image;
 
-import com.example.restapi.file.domain.*;
+import com.example.restapi.file.image.domain.GetGroupImagesMapping;
+import com.example.restapi.file.image.domain.GetImageMapping;
+import com.example.restapi.file.image.domain.GetImagesMapping;
+import com.example.restapi.file.image.domain.ImageEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 public interface ImageRepository extends JpaRepository<ImageEntity, Integer> {

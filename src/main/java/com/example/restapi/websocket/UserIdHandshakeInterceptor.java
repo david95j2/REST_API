@@ -10,7 +10,6 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
 import java.util.Map;
 
 public class UserIdHandshakeInterceptor implements HandshakeInterceptor {
-
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) {
         String path = request.getURI().getPath();

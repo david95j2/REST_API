@@ -1,4 +1,4 @@
-package com.example.restapi.file.domain;
+package com.example.restapi.file.pcd.domain;
 
 public interface GetMapInfoMapping {
     Integer getId();

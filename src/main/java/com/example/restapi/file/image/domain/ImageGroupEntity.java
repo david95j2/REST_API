@@ -1,5 +1,6 @@
-package com.example.restapi.file.domain;
+package com.example.restapi.file.image.domain;
 
+import com.example.restapi.file.pcd.domain.MapEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;

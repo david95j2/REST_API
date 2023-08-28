@@ -1,9 +1,8 @@
-package com.example.restapi.file.domain;
+package com.example.restapi.file.image.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.stereotype.Service;
 
 @Entity
 @Getter @Setter
