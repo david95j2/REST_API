@@ -1,5 +1,6 @@
 package com.example.restapi.file.pcd;
 
+import com.example.restapi.configuration.ServerConfig;
 import com.example.restapi.exception.AppException;
 import com.example.restapi.exception.BaseResponse;
 import com.example.restapi.exception.ErrorCode;
@@ -26,6 +27,7 @@ import java.nio.file.Paths;
 @Transactional
 public class MapService {
     private final MapRepository mapRepository;
+    private final ServerConfig serverConfig;
 
     // 해당 유저의 한에 전체 pcd 리스트 불러오기 -> O
     public BaseResponse getPcdList(String login_id) {
@@ -45,42 +47,22 @@ public class MapService {
         MapEntity mapEntity = mapRepository.findByIdAndLoginId(id, login_id).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOT_FOUND)
         );
-        return loadFileAsResource(mapEntity.getMapPath(), mapEntity.getMapName()+ mapEntity.getMapType());
+        return Util.loadFileAsResource(mapEntity.getMapPath(), mapEntity.getMapName()+ mapEntity.getMapType());
     }
 
     public Resource getPcdSample(Integer id, String login_id) {
         MapSampleMapping result = mapRepository.findSampleByIdAndLoginId(id, login_id).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOT_FOUND));
 
-        return loadFileAsResource(Path.of(result.getPcdSamplePath()).getParent().toString().replace("\\","/"),
+        return Util.loadFileAsResource(Path.of(result.getPcdSamplePath()).getParent().toString().replace("\\","/"),
                 Path.of(result.getPcdSamplePath()).getFileName().toString());
     }
 
-    public Resource loadFileAsResource(String filePath, String fileName) {
-        try {
-            Path fileStorageLocation = Paths.get(filePath).toAbsolutePath().normalize();
-            Path targetPath = fileStorageLocation.resolve(fileName).normalize();
-            Resource resource = new UrlResource(targetPath.toUri());
-            if(resource.exists()) {
-                return resource;
-            } else {
-                throw new RuntimeException("File not found " + fileName);
-            }
-        } catch (MalformedURLException ex) {
-            throw new RuntimeException("File not found " + fileName, ex);
-        }
-    }
-
     public BaseResponse getPcdURL(PostFileReq postFileReq, Integer userId, String login_id) {
-        String regdate = Util.convertToMySQLFormat(postFileReq.getRegdate());
         String url = StringUtils.joinWith("/",login_id,postFileReq.getLocation(),
                 postFileReq.getRegdate().split(" ")[0], postFileReq.getRegdate().split(" ")[1]);
-        PostFileRes postFileRes = new PostFileRes();
-        postFileRes.setFtp_id("sirius");
-        postFileRes.setFtp_ip("211.224.129.230");
-        postFileRes.setFolder_url(url);
-        postFileRes.setFtp_password("sIrius0828");
-        postFileRes.setFtp_port(21000);
-        return new BaseResponse(ErrorCode.SUCCESS, postFileRes);
+
+        return new BaseResponse(ErrorCode.SUCCESS, new PostFileRes(serverConfig.getFtpId(),serverConfig.getFtpIp(),url,
+                serverConfig.getFtpPassword(),serverConfig.getFtpPort()));
     }
 }

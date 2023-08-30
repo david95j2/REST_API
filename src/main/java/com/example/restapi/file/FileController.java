@@ -4,6 +4,7 @@ import com.example.restapi.exception.BaseResponse;
 import com.example.restapi.file.image.ImageService;
 import com.example.restapi.file.pcd.MapService;
 import com.example.restapi.user.UserService;
+import com.example.restapi.utils.Util;
 import lombok.AllArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.core.io.FileSystemResource;
@@ -49,7 +50,7 @@ public class FileController {
             @PathVariable("login_id") String login_id,@PathVariable("pcd_id") Integer id) throws IOException {
         userService.getUserByLoginId(login_id);
         Resource file = mapService.getPcd(id, login_id);
-        return getFile(file, false);
+        return Util.getFile(file, false);
     }
 
     @GetMapping("/api/{login_id}/pcd/{pcd_id}/sample")
@@ -57,7 +58,7 @@ public class FileController {
             @PathVariable("login_id") String login_id,@PathVariable("pcd_id") Integer id) throws IOException {
         userService.getUserByLoginId(login_id);
         Resource file = mapService.getPcdSample(id, login_id);
-        return getFile(file, true);
+        return Util.getFile(file, true);
     }
 
     @GetMapping("/api/{login_id}/pcd/{pcd_id}/images")
@@ -89,7 +90,7 @@ public class FileController {
                                     @PathVariable("pcd_id") int id,
                                    @PathVariable("img_id") int img_id) throws IOException {
         Resource file = imageService.getImg(id, img_id, login_id);
-        return getFile(file, false);
+        return Util.getFile(file, false);
     }
 
     @GetMapping("/api/{login_id}/pcd/{pcd_id}/image/{img_id}/sample")
@@ -98,63 +99,6 @@ public class FileController {
                                    @PathVariable("img_id") int img_id) throws IOException {
         Resource file = imageService.getImg(id, img_id, login_id);
 
-        return getFile(file, true);
-    }
-
-    private String getMediaTypeForExtension(String extension) {
-        switch (extension.toLowerCase()) {
-            case "jpeg":
-            case "jpg":
-                return "image/jpeg";
-            case "png":
-                return "image/png";
-            case "gif":
-                return "image/gif";
-            case "pcd":
-                return "application/octet-stream";
-            default:
-                return null;
-        }
-    }
-
-    private ResponseEntity getFile(Resource file, Boolean isSample) throws IOException {
-
-        String fileName = file.getFilename();
-//        System.out.println((file.contentLength() / 1024) / 1024 );
-        // Assume that the file extension is everything after the last dot
-        String fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
-
-        String mediaType = getMediaTypeForExtension(fileExtension);
-        if (mediaType == null) {
-            throw new RuntimeException("Could not determine file type.");
-        }
-
-        try {
-            FileSystemResource resource;
-            if (isSample) {
-                // Create a temporary file to store the thumbnail
-                File thumbnail = File.createTempFile("thumbnail", "." + fileExtension);
-                try (InputStream in = new FileInputStream(file.getFile())) {
-                    // Use Thumbnailator to create the thumbnail
-                    Thumbnails.of(in)
-                            .size(320, 200)  // Set the dimensions of the thumbnail. Adjust as needed.
-                            .toFile(thumbnail);
-                }
-                resource = new FileSystemResource(thumbnail);
-            } else {
-                resource = new FileSystemResource(file.getFile());
-            }
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(resource.contentLength()));
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
-
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .contentType(MediaType.parseMediaType(mediaType))
-                    .body(resource);
-        } catch (IOException e) {
-            throw new RuntimeException("Error while loading file " + fileName, e);
-        }
+        return Util.getFile(file, true);
     }
 }

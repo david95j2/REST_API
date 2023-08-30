@@ -5,6 +5,7 @@ import com.example.restapi.exception.BaseResponse;
 import com.example.restapi.exception.ErrorCode;
 import com.example.restapi.file.image.domain.GetImageMapping;
 import com.example.restapi.file.image.domain.ImageEntity;
+import com.example.restapi.utils.Util;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -46,21 +47,6 @@ public class ImageService {
                 () -> new AppException(ErrorCode.DATA_NOT_FOUND)
         );
 
-        return loadFileAsResource(imageEntity.getImgPath(),imageEntity.getImgName()+imageEntity.getImgType());
-    }
-
-    public Resource loadFileAsResource(String filePath, String fileName) {
-        try {
-            Path fileStorageLocation = Paths.get(filePath).toAbsolutePath().normalize();
-            Path targetPath = fileStorageLocation.resolve(fileName).normalize();
-            Resource resource = new UrlResource(targetPath.toUri());
-            if(resource.exists()) {
-                return resource;
-            } else {
-                throw new RuntimeException("File not found " + fileName);
-            }
-        } catch (MalformedURLException ex) {
-            throw new RuntimeException("File not found " + fileName, ex);
-        }
+        return Util.loadFileAsResource(imageEntity.getImgPath(),imageEntity.getImgName()+imageEntity.getImgType());
     }
 }
