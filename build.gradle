@@ -39,6 +39,8 @@ dependencies {
     implementation 'black.ninia:jep:4.1.1' /* Jep with Python*/
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    implementation group: 'commons-net', name: 'commons-net', version: '3.6'        /* Ftp Client */
+
 }
 
 tasks.named('test') {

@@ -1,6 +1,11 @@
 package com.example.restapi.utils;
 
+import com.example.restapi.configuration.FtpConfig;
+import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -16,9 +21,12 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
-
+@Slf4j
 public class Util {
+
     public static String convertToMySQLFormat(String input) {
         String datePart = input.substring(0, 8); // 20230829
         String timePart = input.substring(9);     // 161503
@@ -117,6 +125,23 @@ public class Util {
             }
         } catch (MalformedURLException ex) {
             throw new RuntimeException("File not found " + fileName, ex);
+        }
+    }
+
+    public static List<String> listFilesInDirectory(FTPClient ftpClient, String directory) throws IOException {
+        List<String> fileList = new ArrayList<>();
+        retrieveFiles(directory, fileList, ftpClient);
+        return fileList;
+    }
+
+    private static void retrieveFiles(String directory, List<String> fileList, FTPClient ftpClient) throws IOException {
+        FTPFile[] files = ftpClient.listFiles(directory);
+        for (FTPFile file : files) {
+            if (file.isFile()) {
+                fileList.add(directory + "/" + file.getName());
+            } else if (file.isDirectory()) {
+                retrieveFiles(directory + "/" + file.getName(), fileList, ftpClient);
+            }
         }
     }
 }

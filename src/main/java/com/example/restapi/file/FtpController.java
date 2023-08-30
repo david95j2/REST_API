@@ -9,10 +9,12 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @Controller
 @AllArgsConstructor
 public class FtpController {
-    private final MapService mapService;
+    private final FtpService ftpService;
     private final UserService userService;
 
     @GetMapping("ftp/{login_id}/{location}/{date}")
@@ -20,13 +22,13 @@ public class FtpController {
     public BaseResponse getFtpFolderURL(@PathVariable("login_id") String login_id, @PathVariable("location") String location,
                                 @PathVariable("date") String date) {
         userService.getUserByLoginId(login_id);
-        return mapService.getPcdURL(login_id,location,date);
+        return ftpService.getPcdURL(login_id,location,date);
     }
 
-//    @PostMapping("ftp/{login_id}/pcd/sample/success")
-//    @ResponseBody
-//    public BaseResponse postPcdSample(@PathVariable("login_id") String login_id,
-//                                      @Valid @RequestBody PostFileReq postFileReq) {
-//        return mapService.postPcdSample(postFileReq, login_id);
-//    }
+    @PostMapping("ftp/{login_id}/pcd/success")
+    @ResponseBody
+    public BaseResponse postPcd(@PathVariable("login_id") String login_id,
+                                      @Valid @RequestBody PostFileReq postFileReq) throws IOException {
+        return ftpService.postPcdSample(postFileReq, login_id);
+    }
 }
