@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class WebGcsService {
+    private final DroneRepository droneRepository;
     private final MissionRepository missionRepository;
     private final WayPointRepository wayPointRepository;
     private final UserRepository userRepository;
@@ -73,5 +74,26 @@ public class WebGcsService {
             return new BaseResponse(ErrorCode.DATA_NOT_FOUND);
         }
         return new BaseResponse(ErrorCode.SUCCESS, String.valueOf(waypoint_id)+"번 Waypoint가 삭제되었습니다.");
+    }
+
+    public BaseResponse getDroneList(String loginId) {
+        return new BaseResponse(ErrorCode.SUCCESS, droneRepository.findAllByLoginId(loginId));
+    }
+
+    public BaseResponse getDrone(Integer user_id, Integer drone_id) {
+        DroneEntity droneEntity = droneRepository.findByIdAndUserEntityId(drone_id,user_id).orElseThrow(
+                ()-> new AppException(ErrorCode.DATA_NOT_FOUND)
+        );
+
+        return new BaseResponse(ErrorCode.SUCCESS, droneEntity);
+    }
+
+    public BaseResponse putDrone(PutDroneReq putDroneReq) {
+        Integer update_drone_num = droneRepository.updateVoltage(putDroneReq.getDrone_id(),putDroneReq.getDrone_voltage_min(),
+                putDroneReq.getDrone_voltage_max(),putDroneReq.getUser_id());
+        if (update_drone_num == 0) {
+            return new BaseResponse(ErrorCode.DATA_NOT_FOUND);
+        }
+        return new BaseResponse(ErrorCode.SUCCESS, String.valueOf(putDroneReq.getDrone_id())+"번 Voltage값이 수정되었습니다.");
     }
 }

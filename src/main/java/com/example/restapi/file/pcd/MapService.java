@@ -5,8 +5,13 @@ import com.example.restapi.exception.BaseResponse;
 import com.example.restapi.exception.ErrorCode;
 import com.example.restapi.file.pcd.domain.MapEntity;
 import com.example.restapi.file.pcd.domain.MapSampleMapping;
+import com.example.restapi.file.pcd.domain.PostFileReq;
+import com.example.restapi.file.pcd.domain.PostFileRes;
+import com.example.restapi.utils.Util;
+import io.swagger.models.auth.In;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.ResponseEntity;
@@ -64,5 +69,18 @@ public class MapService {
         } catch (MalformedURLException ex) {
             throw new RuntimeException("File not found " + fileName, ex);
         }
+    }
+
+    public BaseResponse getPcdURL(PostFileReq postFileReq, Integer userId, String login_id) {
+        String regdate = Util.convertToMySQLFormat(postFileReq.getRegdate());
+        String url = StringUtils.joinWith("/",login_id,postFileReq.getLocation(),
+                postFileReq.getRegdate().split(" ")[0], postFileReq.getRegdate().split(" ")[1]);
+        PostFileRes postFileRes = new PostFileRes();
+        postFileRes.setFtp_id("sirius");
+        postFileRes.setFtp_ip("211.224.129.230");
+        postFileRes.setFolder_url(url);
+        postFileRes.setFtp_password("sIrius0828");
+        postFileRes.setFtp_port(21000);
+        return new BaseResponse(ErrorCode.SUCCESS, postFileRes);
     }
 }

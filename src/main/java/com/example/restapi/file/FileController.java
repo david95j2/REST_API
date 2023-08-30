@@ -30,47 +30,47 @@ public class FileController {
 
     @GetMapping("/api/{login_id}/pcds")
     @ResponseBody
-    public BaseResponse getPcdList(@PathVariable String login_id) {
+    public BaseResponse getPcdList(@PathVariable("login_id") String login_id) {
         userService.getUserByLoginId(login_id);
         return mapService.getPcdList(login_id);
     }
 
-    @GetMapping("/api/{login_id}/pcd/{id}/info")
+    @GetMapping("/api/{login_id}/pcd/{pcd_id}/info")
     @ResponseBody
     public ResponseEntity getPcdJson(
-            @PathVariable("login_id") String login_id,@PathVariable("id") Integer id) {
+            @PathVariable("login_id") String login_id,@PathVariable("pcd_id") Integer id) {
         userService.getUserByLoginId(login_id);
         return mapService.getPcdJson(id, login_id);
     }
 
 
-    @GetMapping("/api/{login_id}/pcd/{id}")
+    @GetMapping("/api/{login_id}/pcd/{pcd_id}")
     public ResponseEntity<InputStreamResource> getPcd(
-            @PathVariable("login_id") String login_id,@PathVariable("id") Integer id) throws IOException {
+            @PathVariable("login_id") String login_id,@PathVariable("pcd_id") Integer id) throws IOException {
         userService.getUserByLoginId(login_id);
         Resource file = mapService.getPcd(id, login_id);
         return getFile(file, false);
     }
 
-    @GetMapping("/api/{login_id}/pcd/{id}/sample")
+    @GetMapping("/api/{login_id}/pcd/{pcd_id}/sample")
     public ResponseEntity<InputStreamResource> getPcdSample(
-            @PathVariable("login_id") String login_id,@PathVariable("id") Integer id) throws IOException {
+            @PathVariable("login_id") String login_id,@PathVariable("pcd_id") Integer id) throws IOException {
         userService.getUserByLoginId(login_id);
         Resource file = mapService.getPcdSample(id, login_id);
         return getFile(file, true);
     }
 
-    @GetMapping("/api/{login_id}/pcd/{id}/images")
+    @GetMapping("/api/{login_id}/pcd/{pcd_id}/images")
     @ResponseBody
-    public BaseResponse getImageList(@PathVariable("login_id") String login_id,@PathVariable("id") Integer id) {
+    public BaseResponse getImageList(@PathVariable("login_id") String login_id,@PathVariable("pcd_id") Integer id) {
         userService.getUserByLoginId(login_id);
         return imageService.getImgList(id, login_id);
     }
 
-    @GetMapping("/api/{login_id}/pcd/{id}/images/{group_id}")
+    @GetMapping("/api/{login_id}/pcd/{pcd_id}/images/{group_id}")
     @ResponseBody
     public BaseResponse getGroupImageList(
-            @PathVariable("login_id") String login_id,@PathVariable("id") Integer id,
+            @PathVariable("login_id") String login_id,@PathVariable("pcd_id") Integer id,
             @PathVariable("group_id") Integer group_id) {
         userService.getUserByLoginId(login_id);
         return imageService.getGroupImgList(id, group_id,login_id);

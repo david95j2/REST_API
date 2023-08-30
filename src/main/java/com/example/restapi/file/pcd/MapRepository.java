@@ -32,4 +32,9 @@ public interface MapRepository extends JpaRepository<MapEntity, Integer> {
             "where m.id=:pcd_id and mg.userEntity.loginId=:login_id")
     Optional<MapSampleMapping> findSampleByIdAndLoginId(@Param("pcd_id") Integer pcd_id, @Param("login_id") String login_id);
 
+    @Query("select count(*) from MapEntity m " +
+            "join m.mapGroupEntity mg join mg.userEntity u " +
+            "where m.regdate=:regdate and u.id=:userId and mg.location=:location")
+    Integer findCountByUserIdAndRegdateAndLocation(@Param("userId") Integer userId, @Param("regdate") String regdate,
+                                                   @Param("location") String location);
 }
