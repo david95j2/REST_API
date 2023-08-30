@@ -17,32 +17,32 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/api/user")
+    @GetMapping("api/user")
     public BaseResponse getUser(@RequestParam int id) {
         return userService.getUser(id);
     }
 
-    @PostMapping("/api/user")
+    @PostMapping("api/user")
     public ResponseEntity postUser(@Valid @RequestBody PostUserReq postUserReq) {
         return userService.postUser(postUserReq);
     }
 
-    @PatchMapping("/api/user")
+    @PatchMapping("api/user")
     public ResponseEntity patchUser(@Valid @RequestBody ModifyUserReq modifyUserReq) {
         return userService.modifyUser(modifyUserReq);
     }
 
-    @DeleteMapping("/api/user")
+    @DeleteMapping("api/user")
     public ResponseEntity deleteUser(@Valid @RequestBody DeleteUserReq deleteUserReq) {
         return userService.deleteUser(deleteUserReq);
     }
 
-    @PostMapping("/api/user/login")
+    @PostMapping("api/user/login")
     public BaseResponse login(@Valid @RequestBody LoginReq loginReq) {
         return userService.login(loginReq);
     }
 
-    @GetMapping("/api/users")
+    @GetMapping("api/users")
     public BaseResponse getUserlist() {
         return userService.getUserlist();
     }

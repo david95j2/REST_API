@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Getter @Setter
-public class ServerConfig {
+public class FtpConfig {
     @Value("${ftp.ip}")
     private String ftpIp;
 

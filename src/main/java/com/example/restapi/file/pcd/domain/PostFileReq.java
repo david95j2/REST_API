@@ -7,7 +7,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter @Setter
 public class PostFileReq {
-    private String structure;
     private float latitude;
     private float longitude;
     private String regdate;

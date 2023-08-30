@@ -15,10 +15,18 @@ public class FtpController {
     private final MapService mapService;
     private final UserService userService;
 
-    @PostMapping("/ftp/{login_id}/pcd")
+    @GetMapping("ftp/{login_id}/{location}/{date}")
     @ResponseBody
-    public BaseResponse postPcd(@PathVariable("login_id") String login_id, @Valid @RequestBody PostFileReq postFileReq) {
-        Integer user_id = userService.getUserByLoginId(login_id);
-        return mapService.getPcdURL(postFileReq,user_id,login_id);
+    public BaseResponse getFtpFolderURL(@PathVariable("login_id") String login_id, @PathVariable("location") String location,
+                                @PathVariable("date") String date) {
+        userService.getUserByLoginId(login_id);
+        return mapService.getPcdURL(login_id,location,date);
     }
+
+//    @PostMapping("ftp/{login_id}/pcd/sample/success")
+//    @ResponseBody
+//    public BaseResponse postPcdSample(@PathVariable("login_id") String login_id,
+//                                      @Valid @RequestBody PostFileReq postFileReq) {
+//        return mapService.postPcdSample(postFileReq, login_id);
+//    }
 }

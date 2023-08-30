@@ -1,6 +1,6 @@
 package com.example.restapi.file.pcd;
 
-import com.example.restapi.configuration.ServerConfig;
+import com.example.restapi.configuration.FtpConfig;
 import com.example.restapi.exception.AppException;
 import com.example.restapi.exception.BaseResponse;
 import com.example.restapi.exception.ErrorCode;
@@ -9,25 +9,21 @@ import com.example.restapi.file.pcd.domain.MapSampleMapping;
 import com.example.restapi.file.pcd.domain.PostFileReq;
 import com.example.restapi.file.pcd.domain.PostFileRes;
 import com.example.restapi.utils.Util;
-import io.swagger.models.auth.In;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.net.MalformedURLException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class MapService {
     private final MapRepository mapRepository;
-    private final ServerConfig serverConfig;
+    private final FtpConfig ftpConfig;
 
     // 해당 유저의 한에 전체 pcd 리스트 불러오기 -> O
     public BaseResponse getPcdList(String login_id) {
@@ -58,11 +54,17 @@ public class MapService {
                 Path.of(result.getPcdSamplePath()).getFileName().toString());
     }
 
-    public BaseResponse getPcdURL(PostFileReq postFileReq, Integer userId, String login_id) {
-        String url = StringUtils.joinWith("/",login_id,postFileReq.getLocation(),
-                postFileReq.getRegdate().split(" ")[0], postFileReq.getRegdate().split(" ")[1]);
+    public BaseResponse getPcdURL(String login_id,String location, String date) {
+        String url = StringUtils.joinWith("/",login_id,location,
+                date.split(" ")[0], date.split(" ")[1]);
 
-        return new BaseResponse(ErrorCode.SUCCESS, new PostFileRes(serverConfig.getFtpId(),serverConfig.getFtpIp(),url,
-                serverConfig.getFtpPassword(),serverConfig.getFtpPort()));
+        return new BaseResponse(ErrorCode.SUCCESS, new PostFileRes(ftpConfig.getFtpId(), ftpConfig.getFtpIp(),url,
+                ftpConfig.getFtpPassword(), ftpConfig.getFtpPort()));
     }
+
+//    public BaseResponse postPcdSample(PostFileReq postFileReq, String login_id) {
+//        String url = StringUtils.joinWith("/",login_id,postFileReq.getLocation(),
+//                postFileReq.getRegdate().split(" ")[0], postFileReq.getRegdate().split(" ")[1]);
+//
+//    }
 }
