@@ -2,8 +2,6 @@ package com.example.restapi.file.image.domain;
 
 public interface GetImageMapping {
     Integer getId();
-    String getImgName();
-    String getImgType();
     String getLocation();
     String getRegdate();
     Float getPosX();

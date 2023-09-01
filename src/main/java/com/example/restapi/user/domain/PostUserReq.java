@@ -28,7 +28,6 @@ public class PostUserReq {
         return UserEntity.builder()
                 .loginId(login_id)
                 .password(password)
-                .apiKey(api_key)
                 .regdate(regdate).build();
     }
 

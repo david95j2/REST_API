@@ -1,6 +1,7 @@
 package com.example.restapi.utils;
 
 import com.example.restapi.configuration.FtpConfig;
+import com.example.restapi.file.pcd.domain.InfoMapData;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.net.ftp.FTPClient;
@@ -14,10 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -142,6 +140,67 @@ public class Util {
             } else if (file.isDirectory()) {
                 retrieveFiles(directory + "/" + file.getName(), fileList, ftpClient);
             }
+        }
+    }
+
+    public static InfoMapData extractInfoMapDataFromResults(List<String> results, FTPClient ftpClient) throws IOException {
+        String infoMapFilePath = results.stream()
+                .filter(path -> path.endsWith("infoMap.txt"))
+                .findFirst()
+                .orElse(null);
+
+        if (infoMapFilePath == null) {
+            throw new FileNotFoundException("infoMap.txt not found in the provided list.");
+        }
+
+        return parseInfoMapFromFtp(ftpClient, infoMapFilePath);
+    }
+
+    private static InfoMapData parseInfoMapFromFtp(FTPClient ftpClient, String filePath) throws IOException {
+        try (InputStream is = ftpClient.retrieveFileStream(filePath);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+
+            InfoMapData infoMapData = new InfoMapData();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(" : ");
+                if (parts.length == 2) {
+                    String key = parts[0].trim();
+                    String value = parts[1].trim();
+
+                    switch (key) {
+                        case "regdate":
+                            infoMapData.setRegdate(value);
+                            break;
+                        case "location":
+                            infoMapData.setLocation(value);
+                            break;
+                        case "latitude":
+                            infoMapData.setLatitude(Float.parseFloat(value));
+                            break;
+                        case "longitude":
+                            infoMapData.setLongitude(Float.parseFloat(value));
+                            break;
+                        case "number of pointcloud":
+                            infoMapData.setNumberOfPointCloud(Integer.parseInt(value));
+                            break;
+                        case "map size":
+                            infoMapData.setMapSize(Integer.parseInt(value));
+                            break;
+                        case "x":
+                            infoMapData.setX(Float.parseFloat(value));
+                            break;
+                        case "y":
+                            infoMapData.setY(Float.parseFloat(value));
+                            break;
+                        case "z":
+                            infoMapData.setZ(Float.parseFloat(value));
+                            break;
+                    }
+                }
+            }
+
+            return infoMapData;
         }
     }
 }

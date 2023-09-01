@@ -1,7 +1,7 @@
 package com.example.restapi.file;
 
 import com.example.restapi.exception.BaseResponse;
-import com.example.restapi.file.pcd.MapService;
+import com.example.restapi.file.pcd.FtpService;
 import com.example.restapi.file.pcd.domain.PostFileReq;
 import com.example.restapi.user.UserService;
 import jakarta.validation.Valid;
@@ -29,6 +29,7 @@ public class FtpController {
     @ResponseBody
     public BaseResponse postPcd(@PathVariable("login_id") String login_id,
                                       @Valid @RequestBody PostFileReq postFileReq) throws IOException {
-        return ftpService.postPcdSample(postFileReq, login_id);
+        Integer user_id = userService.getUserByLoginId(login_id);
+        return ftpService.postPcdSample(postFileReq, login_id, user_id);
     }
 }

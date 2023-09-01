@@ -17,8 +17,8 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("api/user")
-    public BaseResponse getUser(@RequestParam int id) {
+    @GetMapping("api/user/{user_id}")
+    public BaseResponse getUser(@PathVariable("user_id") Integer id) {
         return userService.getUser(id);
     }
 

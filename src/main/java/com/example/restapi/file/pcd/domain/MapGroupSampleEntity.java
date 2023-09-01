@@ -11,6 +11,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 public class MapGroupSampleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

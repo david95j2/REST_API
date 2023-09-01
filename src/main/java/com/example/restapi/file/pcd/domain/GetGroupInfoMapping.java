@@ -1,11 +1,12 @@
 package com.example.restapi.file.pcd.domain;
 
-
-public interface GetMapInfoMapping {
-    String getFileName();
+public interface GetGroupInfoMapping {
+    Integer getMapGroupId();
     String getLocation();
     Float getLatitude();
     Float getLongitude();
+    Integer getSampleCount();
+    Integer getMapCount();
     String getRegdate();
 
 }

@@ -11,7 +11,6 @@ public class GetUserRes {
     private int id;
     private String login_id;
     private String password;
-    private String restapi_key;
     private String regdate;
 
 }

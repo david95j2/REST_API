@@ -31,9 +31,16 @@ public class FileController {
 
     @GetMapping("api/{login_id}/pcds")
     @ResponseBody
-    public BaseResponse getPcdList(@PathVariable("login_id") String login_id) {
+    public BaseResponse getGroupList(@PathVariable("login_id") String login_id) {
         userService.getUserByLoginId(login_id);
         return mapService.getPcdList(login_id);
+    }
+
+    @GetMapping("api/{login_id}/pcds/{pcd_group_id}")
+    @ResponseBody
+    public BaseResponse getGroupPcdList(@PathVariable("login_id") String login_id, @PathVariable("pcd_group_id") Integer map_group_id) {
+        userService.getUserByLoginId(login_id);
+        return mapService.getGroupPcdList(login_id, map_group_id);
     }
 
     @GetMapping("api/{login_id}/pcd/{pcd_id}/info")
@@ -53,7 +60,7 @@ public class FileController {
         return Util.getFile(file, false);
     }
 
-    @GetMapping("api/{login_id}/pcd/{pcd_id}/sample")
+    @GetMapping("api/{login_id}/pcds/{pcd_id}/sample")
     public ResponseEntity<InputStreamResource> getPcdSample(
             @PathVariable("login_id") String login_id,@PathVariable("pcd_id") Integer id) throws IOException {
         userService.getUserByLoginId(login_id);

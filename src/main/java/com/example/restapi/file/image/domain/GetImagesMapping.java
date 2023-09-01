@@ -5,6 +5,5 @@ public interface GetImagesMapping {
     String getGroupName();
     Integer getCount();
     String getLocation();
-    String getStructure();
     String getRegdate();
 }

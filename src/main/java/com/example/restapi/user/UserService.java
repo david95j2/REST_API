@@ -40,7 +40,7 @@ public class UserService {
 
         return new BaseResponse(ErrorCode.SUCCESS,
                 new GetUserRes(userEntity.getId(),userEntity.getLoginId(),
-                        userEntity.getPassword(), userEntity.getApiKey(), userEntity.getRegdate()));
+                        userEntity.getPassword(), userEntity.getRegdate()));
     }
 
     public ResponseEntity postUser(PostUserReq postUserReq) {
@@ -72,7 +72,7 @@ public class UserService {
 
         return new ResponseEntity(
                 new BaseResponse(ErrorCode.ACCEPTED,new GetUserRes(userEntity.getId(),userEntity.getLoginId(),
-                        userEntity.getPassword(), userEntity.getApiKey(), userEntity.getRegdate()))
+                        userEntity.getPassword(),userEntity.getRegdate()))
                 ,ErrorCode.ACCEPTED.getStatus());
     }
 
@@ -98,7 +98,7 @@ public class UserService {
 
         return new BaseResponse(ErrorCode.SUCCESS,
                 new GetUserRes(userEntity.getId(),userEntity.getLoginId(),
-                        userEntity.getPassword(), userEntity.getApiKey(), userEntity.getRegdate()));
+                        userEntity.getPassword(),userEntity.getRegdate()));
     }
 
     public BaseResponse getUserlist() {

@@ -21,13 +21,8 @@ public class UserEntity {
     @Column(name = "login_id")
     private String loginId;
     private String password;
+    @Column(name = "user_regdate")
     private String regdate;
-    @Column(name = "api_key")
-    private String apiKey;
-    @Column(name = "api_key_regdate")
-    private String apiKeyRegdate;
-    @Column(name = "api_key_status")
-    private String apiKeyStatus;
 
     // 회원가입 (entity->DTO)
     public PostUserRes toPostUserRes() {

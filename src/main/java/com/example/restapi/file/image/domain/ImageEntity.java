@@ -19,10 +19,6 @@ public class ImageEntity {
     private Integer id;
     @Column(name = "img_path")
     private String imgPath;
-    @Column(name = "img_name")
-    private String imgName;
-    @Column(name = "img_type")
-    private String imgType;
     @Column(name = "regdate")
     private String regdate;
 
@@ -38,9 +34,7 @@ public class ImageEntity {
 
     public GetImageRes toGetImageRes() {
         GetImageRes dto = new GetImageRes();
-        dto.setFile_name(this.imgName);
-        dto.setFile_type(this.imgType);
-        dto.setFile_location(this.imageGroupEntity.getMapEntity().getMapGroupEntity().getLocation()); // Assuming this is the location
+        dto.setFile_location(this.imageGroupEntity.getMapGroupEntity().getLocation()); // Assuming this is the location
         dto.setFile_regdate(this.regdate);
 
         if(this.locationEntity != null) { // Assuming locationEntity could be null

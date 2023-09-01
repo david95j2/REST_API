@@ -16,6 +16,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 public class MapGroupEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,6 +25,8 @@ public class MapGroupEntity {
     private String location;
     private Float latitude;
     private Float longitude;
+    @Column(name = "map_group_regdate")
+    private String regdate;
 
     @JsonBackReference
     @ManyToOne
@@ -33,5 +36,10 @@ public class MapGroupEntity {
     @JsonManagedReference
     @JsonIgnore
     @OneToMany(mappedBy = "mapGroupEntity")
-    private List<MapGroupSampleEntity> mapGroupSampleEntity;
+    private List<MapGroupSampleEntity> mapGroupSampleEntites;
+
+    @JsonManagedReference
+    @JsonIgnore
+    @OneToMany(mappedBy = "mapGroupEntity")
+    private List<MapEntity> mapEntities;
 }

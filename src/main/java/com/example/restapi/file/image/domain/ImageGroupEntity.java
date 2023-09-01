@@ -1,6 +1,7 @@
 package com.example.restapi.file.image.domain;
 
 import com.example.restapi.file.pcd.domain.MapEntity;
+import com.example.restapi.file.pcd.domain.MapGroupEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -22,11 +23,14 @@ public class ImageGroupEntity {
     private Integer id;
     @Column(name = "img_group_name")
     private String imgGroupName;
+    private Integer distance;
+    @Column(name = "img_group_regdate")
+    private String imgGroupRegdate;
 
     @JsonBackReference
     @ManyToOne
-    @JoinColumn(name = "map_id")
-    private MapEntity mapEntity;
+    @JoinColumn(name = "map_group_id")
+    private MapGroupEntity mapGroupEntity;
 
     @JsonManagedReference
     @JsonIgnore
