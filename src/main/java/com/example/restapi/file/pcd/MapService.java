@@ -19,7 +19,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +34,39 @@ public class MapService {
 
     // 해당 유저의 한에 전체 pcd 리스트 불러오기 -> O
     public BaseResponse getPcdList(String login_id) {
-        return new BaseResponse(ErrorCode.SUCCESS, mapGroupRepository.findAllByLoginId(login_id));
+        List<GetGroupInfoMapping> mapGroupInfos = mapGroupRepository.findMapGroupInfoByUserId(login_id);
+        List<Map<String, Object>> responseList = new ArrayList<>();
+
+        Map<String, List<GetGroupInfoMapping>> groupByLocation = mapGroupInfos.stream()
+                .collect(Collectors.groupingBy(GetGroupInfoMapping::getLocation));
+
+        groupByLocation.forEach((location, infos) -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("location", location);
+
+            if (infos.size() == 1) {
+                GetGroupInfoMapping info = infos.get(0);
+                map.put("id",info.getMapGroupId());
+                map.put("latitude", info.getLatitude());
+                map.put("longitude", info.getLongitude());
+                map.put("regdate", info.getRegdate().toString());
+            } else {
+                List<Map<String, Object>> dataCounts = new ArrayList<>();
+                for (GetGroupInfoMapping info : infos) {
+                    Map<String, Object> dataMap = new HashMap<>();
+                    dataMap.put("id",info.getMapGroupId());
+                    dataMap.put("latitude", info.getLatitude());
+                    dataMap.put("longitude", info.getLongitude());
+                    dataMap.put("regdate", info.getRegdate().toString());
+                    dataCounts.add(dataMap);
+                }
+                map.put("data_count", dataCounts);
+            }
+
+            responseList.add(map);
+        });
+
+        return new BaseResponse(ErrorCode.SUCCESS, responseList);
     }
 
     @Transactional(readOnly = true)

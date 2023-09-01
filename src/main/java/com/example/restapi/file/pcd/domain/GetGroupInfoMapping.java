@@ -5,8 +5,6 @@ public interface GetGroupInfoMapping {
     String getLocation();
     Float getLatitude();
     Float getLongitude();
-    Integer getSampleCount();
-    Integer getMapCount();
     String getRegdate();
 
 }
