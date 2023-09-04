@@ -75,14 +75,14 @@ public class FileController {
         return imageService.getImgList(id, login_id);
     }
 
-    @GetMapping("api/{login_id}/pcd/{pcd_id}/images/{group_id}")
-    @ResponseBody
-    public BaseResponse getGroupImageList(
-            @PathVariable("login_id") String login_id,@PathVariable("pcd_id") Integer id,
-            @PathVariable("group_id") Integer group_id) {
-        userService.getUserByLoginId(login_id);
-        return imageService.getGroupImgList(id, group_id,login_id);
-    }
+//    @GetMapping("api/{login_id}/pcd/{pcd_id}/images/{group_id}")
+//    @ResponseBody
+//    public BaseResponse getGroupImageList(
+//            @PathVariable("login_id") String login_id,@PathVariable("pcd_id") Integer id,
+//            @PathVariable("group_id") Integer group_id) {
+//        userService.getUserByLoginId(login_id);
+//        return imageService.getGroupImgList(id, group_id,login_id);
+//    }
 
     @GetMapping("api/{login_id}/pcd/{pcd_id}/image/{img_id}/info")
     @ResponseBody

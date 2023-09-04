@@ -3,10 +3,8 @@ package com.example.restapi.file.image;
 import com.example.restapi.exception.AppException;
 import com.example.restapi.exception.BaseResponse;
 import com.example.restapi.exception.ErrorCode;
-import com.example.restapi.file.image.domain.GetGroupImagesMapping;
-import com.example.restapi.file.image.domain.GetGroupImagesRes;
-import com.example.restapi.file.image.domain.GetImageMapping;
-import com.example.restapi.file.image.domain.ImageEntity;
+import com.example.restapi.file.image.domain.*;
+import com.example.restapi.file.pcd.domain.GetGroupPcdRes;
 import com.example.restapi.file.pcd.domain.MapEntity;
 import com.example.restapi.utils.Util;
 import lombok.RequiredArgsConstructor;
@@ -27,25 +25,44 @@ import java.util.stream.Collectors;
 public class ImageService {
     private final ImageRepository imageRepository;
 
-    public BaseResponse getImgList(Integer id, String login_id) {
-        return new BaseResponse(ErrorCode.SUCCESS, imageRepository.findAllByMapIdAndLoginId(id, login_id));
-    }
-
     @Transactional(readOnly = true)
-    public BaseResponse getGroupImgList(Integer map_id,Integer group_id, String login_id) {
-        List<GetGroupImagesMapping> getGroupImagesMappings = imageRepository.findAllGroupByMapIdAndLoginId(map_id, group_id, login_id);
-        List<GetGroupImagesRes> result = getGroupImagesMappings.stream()
+    public BaseResponse getImgList(Integer id, String login_id) {
+        List<GetImagesMapping> reulsts = imageRepository.findAllByMapIdAndLoginId(id, login_id);
+
+        List<GetImagesRes> result = reulsts.stream()
                 .map(mapping -> {
-                    String fileName = Paths.get(mapping.getImgPath()).getFileName().toString();
-                    GetGroupImagesRes getGroupImagesRes = new GetGroupImagesRes();
-                    getGroupImagesRes.setId(mapping.getId());
-                    getGroupImagesRes.setImgName(fileName);
-                    getGroupImagesRes.setRegdate(mapping.getRegdate());
-                    return getGroupImagesRes;
+                    String fileName = Paths.get(mapping.getFileName()).getFileName().toString();
+                    GetImagesRes getImagesRes = new GetImagesRes();
+                    getImagesRes.setId(mapping.getId());
+                    getImagesRes.setFile_name(fileName);
+                    getImagesRes.setRegdate(mapping.getRegdate());
+                    getImagesRes.setPos_x(mapping.getPosX());
+                    getImagesRes.setPos_y(mapping.getPosY());
+                    getImagesRes.setPos_z(mapping.getPosZ());
+                    getImagesRes.setRoll(mapping.getRoll());
+                    getImagesRes.setPitch(mapping.getPitch());
+                    getImagesRes.setYaw(mapping.getYaw());
+                    return getImagesRes;
                 }).collect(Collectors.toList());
 
         return new BaseResponse(ErrorCode.SUCCESS, result);
     }
+
+//    @Transactional(readOnly = true)
+//    public BaseResponse getGroupImgList(Integer map_id,Integer group_id, String login_id) {
+//        List<GetGroupImagesMapping> getGroupImagesMappings = imageRepository.findAllGroupByMapIdAndLoginId(map_id, group_id, login_id);
+//        List<GetGroupImagesRes> result = getGroupImagesMappings.stream()
+//                .map(mapping -> {
+//                    String fileName = Paths.get(mapping.getImgPath()).getFileName().toString();
+//                    GetGroupImagesRes getGroupImagesRes = new GetGroupImagesRes();
+//                    getGroupImagesRes.setId(mapping.getId());
+//                    getGroupImagesRes.setImgName(fileName);
+//                    getGroupImagesRes.setRegdate(mapping.getRegdate());
+//                    return getGroupImagesRes;
+//                }).collect(Collectors.toList());
+//
+//        return new BaseResponse(ErrorCode.SUCCESS, result);
+//    }
 
     public ResponseEntity getImgJson(Integer id, Integer img_id, String login_id) {
         GetImageMapping getImageMapping = imageRepository.findByIdAndMapIdAndLoginId(img_id, id, login_id).orElseThrow(

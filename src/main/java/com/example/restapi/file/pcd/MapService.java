@@ -4,6 +4,7 @@ import com.example.restapi.configuration.FtpConfig;
 import com.example.restapi.exception.AppException;
 import com.example.restapi.exception.BaseResponse;
 import com.example.restapi.exception.ErrorCode;
+import com.example.restapi.file.image.domain.GetGroupImagesRes;
 import com.example.restapi.file.pcd.domain.*;
 import com.example.restapi.utils.Util;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -71,14 +73,17 @@ public class MapService {
 
     @Transactional(readOnly = true)
     public BaseResponse getGroupPcdList(String loginId, Integer mapGroupId) {
-        List<MapEntity> map_results = mapRepository.findAllByMapGroupIdAndLoginId(mapGroupId,loginId);
-
-        for (MapEntity entity : map_results) {
-            File file = new File(entity.getMapPath());
-            entity.setMapPath(file.getName());
-        }
-
-        return new BaseResponse(ErrorCode.SUCCESS, map_results);
+        List<GetGroupListMapping> map_results = mapRepository.findAllByMapGroupIdAndLoginId(mapGroupId,loginId);
+        List<GetGroupPcdRes> result = map_results.stream()
+                .map(mapping -> {
+                    String fileName = Paths.get(mapping.getFileName()).getFileName().toString();
+                    GetGroupPcdRes getGroupPcdRes = new GetGroupPcdRes();
+                    getGroupPcdRes.setId(mapping.getPcdId());
+                    getGroupPcdRes.setFile_name(fileName);
+                    getGroupPcdRes.setRegdate(mapping.getRegdate());
+                    return getGroupPcdRes;
+                }).collect(Collectors.toList());
+        return new BaseResponse(ErrorCode.SUCCESS, result);
     }
 
     @Transactional(readOnly = true)

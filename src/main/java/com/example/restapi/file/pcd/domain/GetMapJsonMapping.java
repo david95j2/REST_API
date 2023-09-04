@@ -1,6 +1,7 @@
 package com.example.restapi.file.pcd.domain;
 
 
+
 public interface GetMapJsonMapping {
     String getFileName();
     String getLocation();

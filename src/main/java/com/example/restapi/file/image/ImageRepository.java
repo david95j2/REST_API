@@ -30,17 +30,24 @@ public interface ImageRepository extends JpaRepository<ImageEntity, Integer> {
     Optional<ImageEntity> findPathByIdAndMapIdAndLoginId(
             @Param("img_id") int img_id, @Param("map_id") int map_id, @Param("login_id") String login_id);
 
-    @Query("select ig.id as id, ig.imgGroupName as groupName, count (*) as count," +
-            " mg.location as location, ig.imgGroupRegdate as regdate " +
+//    @Query("select ig.id as id, ig.imgGroupName as groupName, count (*) as count," +
+//            " mg.location as location, ig.imgGroupRegdate as regdate " +
+//            "from ImageEntity i " +
+//            "join i.imageGroupEntity ig join ig.mapGroupEntity mg join mg.mapEntities m join mg.userEntity u " +
+//            "where m.id=:map_id and u.loginId=:login_id " +
+//            "group by i.imageGroupEntity.id, mg.location")
+//    List<GetImagesMapping> findAllByMapIdAndLoginId(@Param("map_id") int map_id, @Param("login_id") String login_id);
+
+    @Query("select i.id as id, i.imgPath as fileName, i.regdate as regdate, i.locationEntity.posX as posX, i.locationEntity.posY as posY, i.locationEntity.posZ as posZ, " +
+            "i.locationEntity.roll as roll , i.locationEntity.pitch as pitch , i.locationEntity.yaw as yaw " +
             "from ImageEntity i " +
             "join i.imageGroupEntity ig join ig.mapGroupEntity mg join mg.mapEntities m join mg.userEntity u " +
-            "where m.id=:map_id and u.loginId=:login_id " +
-            "group by i.imageGroupEntity.id, mg.location")
+            "where m.id=:map_id and u.loginId=:login_id")
     List<GetImagesMapping> findAllByMapIdAndLoginId(@Param("map_id") int map_id, @Param("login_id") String login_id);
 
-    @Query("select i.id as id, i.imgPath as imgPath, i.regdate as regdate from ImageEntity i " +
-            "join i.imageGroupEntity ig join ig.mapGroupEntity mg join mg.mapEntities m join mg.userEntity u " +
-            "where m.id=:map_id and ig.id=:group_id and u.loginId=:login_id")
-    List<GetGroupImagesMapping> findAllGroupByMapIdAndLoginId(
-            @Param("map_id") int map_id, @Param("group_id")int group_id, @Param("login_id") String login_id);
+//    @Query("select i.id as id, i.imgPath as imgPath, i.regdate as regdate from ImageEntity i " +
+//            "join i.imageGroupEntity ig join ig.mapGroupEntity mg join mg.mapEntities m join mg.userEntity u " +
+//            "where m.id=:map_id and ig.id=:group_id and u.loginId=:login_id")
+//    List<GetGroupImagesMapping> findAllGroupByMapIdAndLoginId(
+//            @Param("map_id") int map_id, @Param("group_id")int group_id, @Param("login_id") String login_id);
 }

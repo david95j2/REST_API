@@ -1,9 +1,6 @@
 package com.example.restapi.file.pcd;
 
-import com.example.restapi.file.pcd.domain.GetMapInfoMapping;
-import com.example.restapi.file.pcd.domain.GetMapJsonMapping;
-import com.example.restapi.file.pcd.domain.MapEntity;
-import com.example.restapi.file.pcd.domain.MapSampleMapping;
+import com.example.restapi.file.pcd.domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -37,9 +34,9 @@ public interface MapRepository extends JpaRepository<MapEntity, Integer> {
     Optional<MapSampleMapping> findSampleByIdAndLoginId(@Param("pcd_id") Integer pcd_id, @Param("login_id") String login_id);
 
 
-    @Query("select m " +
+    @Query("select m.id as pcdId, m.mapPath as fileName, mg.regdate as regdate " +
             "from MapEntity m " +
             "join m.mapGroupEntity mg join mg.userEntity u " +
             "where mg.id=:map_group_id and u.loginId=:login_id")
-    List<MapEntity> findAllByMapGroupIdAndLoginId(@Param("map_group_id") Integer map_group_id,@Param("login_id") String login_id);
+    List<GetGroupListMapping> findAllByMapGroupIdAndLoginId(@Param("map_group_id") Integer map_group_id, @Param("login_id") String login_id);
 }
