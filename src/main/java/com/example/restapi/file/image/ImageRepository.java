@@ -16,9 +16,8 @@ public interface ImageRepository extends JpaRepository<ImageEntity, Integer> {
             "from ImageEntity i " +
             "join i.imageGroupEntity ig join i.locationEntity il " +
             "join ig.mapEntity m join m.mapDateEntity md join md.mapGroupEntity mg join mg.userEntity u " +
-            "where i.id=:img_id and m.id=:map_id")
-    Optional<ImageEntity> findPathByIdAndMapIdAndLoginId(
-            @Param("img_id") int img_id, @Param("map_id") int map_id);
+            "where i.id=:img_id")
+    Optional<ImageEntity> findPathByIdAndMapIdAndLoginId(@Param("img_id") int img_id);
 
     @Query("select ig.id as id, ig.imgGroupName as groupName, count (*) as count," +
             " mg.location as location, ig.imgGroupRegdate as regdate " +
@@ -35,7 +34,6 @@ public interface ImageRepository extends JpaRepository<ImageEntity, Integer> {
             "from ImageEntity i join i.locationEntity il " +
             "join i.imageGroupEntity ig join ig.mapEntity m join m.mapDateEntity md " +
             "join md.mapGroupEntity mg join mg.userEntity u " +
-            "where m.id=:map_id and ig.id=:group_id")
-    List<GetImagesMapping> findAllGroupByMapIdAndLoginId(
-            @Param("map_id") int map_id, @Param("group_id")int group_id);
+            "where ig.id=:group_id")
+    List<GetImagesMapping> findAllGroupByMapIdAndLoginId(@Param("group_id")int group_id);
 }

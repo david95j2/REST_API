@@ -27,8 +27,8 @@ public class ImageService {
     }
 
     @Transactional(readOnly = true)
-    public BaseResponse getGroupImgList(Integer map_id,Integer group_id) {
-        List<GetImagesMapping> results = imageRepository.findAllGroupByMapIdAndLoginId(map_id, group_id);
+    public BaseResponse getGroupImgList(Integer group_id) {
+        List<GetImagesMapping> results = imageRepository.findAllGroupByMapIdAndLoginId(group_id);
 
         List<GetImagesRes> result = results.stream()
                 .map(mapping -> {
@@ -50,8 +50,8 @@ public class ImageService {
     }
 
 
-    public Resource getImg(Integer id, Integer img_id) {
-        ImageEntity imageEntity = imageRepository.findPathByIdAndMapIdAndLoginId(img_id,id).orElseThrow(
+    public Resource getImg(Integer img_id) {
+        ImageEntity imageEntity = imageRepository.findPathByIdAndMapIdAndLoginId(img_id).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOT_FOUND)
         );
         return Util.loadFileAsResource(Paths.get(imageEntity.getImgPath()).getParent().toString(),

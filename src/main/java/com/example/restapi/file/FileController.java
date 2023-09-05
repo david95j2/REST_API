@@ -75,28 +75,25 @@ public class FileController {
         return imageService.getImgList(id);
     }
 
-    @GetMapping("api/{login_id}/pcd/{pcd_id}/images/{group_id}")
+    @GetMapping("api/{login_id}/images/{group_id}")
     @ResponseBody
     public BaseResponse getGroupImageList(
-            @PathVariable("login_id") String login_id,@PathVariable("pcd_id") Integer id,
-            @PathVariable("group_id") Integer group_id) {
+            @PathVariable("login_id") String login_id, @PathVariable("group_id") Integer group_id) {
         userService.getUserByLoginId(login_id);
-        return imageService.getGroupImgList(id, group_id);
+        return imageService.getGroupImgList(group_id);
     }
 
-    @GetMapping("api/{login_id}/pcd/{pcd_id}/image/{img_id}")
-    public ResponseEntity getImage(@PathVariable("login_id") String login_id,
-                                    @PathVariable("pcd_id") int id,
-                                   @PathVariable("img_id") int img_id) throws IOException {
-        Resource file = imageService.getImg(id, img_id);
+    @GetMapping("api/{login_id}/image/{img_id}")
+    public ResponseEntity getImage(@PathVariable("login_id") String login_id, @PathVariable("img_id") int img_id) throws IOException {
+        userService.getUserByLoginId(login_id);
+        Resource file = imageService.getImg(img_id);
         return Util.getFile(file, false);
     }
 
-    @GetMapping("api/{login_id}/pcd/{pcd_id}/image/{img_id}/sample")
-    public ResponseEntity getSampleImage(@PathVariable("login_id") String login_id,
-                                   @PathVariable("pcd_id") int id,
-                                   @PathVariable("img_id") int img_id) throws IOException {
-        Resource file = imageService.getImg(id, img_id);
+    @GetMapping("api/{login_id}/image/{img_id}/sample")
+    public ResponseEntity getSampleImage(@PathVariable("login_id") String login_id,@PathVariable("img_id") int img_id) throws IOException {
+        userService.getUserByLoginId(login_id);
+        Resource file = imageService.getImg(img_id);
 
         return Util.getFile(file, true);
     }

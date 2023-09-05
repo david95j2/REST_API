@@ -119,10 +119,10 @@ public class Util {
             if(resource.exists()) {
                 return resource;
             } else {
-                throw new RuntimeException("File not found " + fileName);
+                throw new RuntimeException("File not found " +filePath+" "+ fileName);
             }
         } catch (MalformedURLException ex) {
-            throw new RuntimeException("File not found " + fileName, ex);
+            throw new RuntimeException("[MalformedURLException Error] File not found " + fileName, ex);
         }
     }
 

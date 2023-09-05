@@ -29,6 +29,7 @@ public class FtpService {
     private final FtpConfig ftpConfig;
     private final MapRepository mapRepository;
     private final MapGroupRepository mapGroupRepository;
+    private final MapDateRepository mapDateRepository;
     private final MapGroupSampleRepository mapGroupSampleRepository;
     private final UserRepository userRepository;
 
@@ -41,8 +42,16 @@ public class FtpService {
     }
 
     public BaseResponse postPcdSample(PostFileReq postFileReq, String login_id, Integer user_id) throws IOException {
+        /* update map_group location */
+        MapGroupEntity mapGroupEntity = mapGroupRepository.findByLocation(postFileReq.getLocation()).orElse(null);
+        if (mapGroupEntity != null) {
+            mapGroupEntity.setLatitude(postFileReq.getLatitude());
+            mapGroupEntity.setLongitude(postFileReq.getLongitude());
+        }
+
         String url = StringUtils.joinWith("/",login_id,postFileReq.getLocation(),
                 postFileReq.getRegdate().split("_")[0], postFileReq.getRegdate().split("_")[1]);
+
         FTPClient ftpClient = ftpConfig.open();
         try {
             List<String> results = Util.listFilesInDirectory(ftpClient,url+"/pcd");
@@ -50,35 +59,43 @@ public class FtpService {
                 return new BaseResponse(ErrorCode.DATA_NOT_FOUND);
             }
             UserEntity userEntity = userRepository.findById(user_id).orElseThrow(()-> new AppException(ErrorCode.NOT_FOUND));
-
             /* infoMap.txt -> Dto */
             InfoMapData infoMapData = Util.extractInfoMapDataFromResults(results,ftpClient);
 
             /* map_group post */
-            MapGroupEntity mapGroupEntity = MapGroupEntity.builder()
+            MapGroupEntity newMapGroupEntity = MapGroupEntity.builder()
                     .userEntity(userEntity)
                     .location(postFileReq.getLocation())
                     .latitude(postFileReq.getLatitude())
                     .longitude(postFileReq.getLongitude())
                     .build();
-            Integer mag_group_num = mapGroupRepository.save(mapGroupEntity).getId();
+            mapGroupRepository.save(newMapGroupEntity).getId();
+
+            /* map_group_date post */
+            MapDateEntity mapDateEntity = MapDateEntity.builder()
+                    .mapGroupEntity(newMapGroupEntity)
+                    .date(postFileReq.getRegdate().split("_")[0])
+                    .time(postFileReq.getRegdate().split("_")[1])
+                    .build();
+            mapDateRepository.save(mapDateEntity).getId();
 
 
             /* map_group_sample post */
-//            results.forEach(x -> System.out.println(x));
             List<String> sampleFiles = results.stream()
                     .filter(path -> path.contains("pcd/sample/") && !path.endsWith("/"))
                     .collect(Collectors.toList());
+
             Integer map_group_sample_num = 0;
             for (String filePath : sampleFiles) {
                 MapGroupSampleEntity mapGroupSampleEntity = MapGroupSampleEntity.builder()
+                        .mapDateEntity(mapDateEntity)
                         .mapSamplePath("/hdd_ext/part6/sirius/"+filePath)
                         .mapSampleRegdate(Util.convertToMySQLFormat(postFileReq.getRegdate()))
-//                        .mapGroupEntity(mapGroupEntity)
                         .build();
                 mapGroupSampleRepository.save(mapGroupSampleEntity).getId();
                 map_group_sample_num = map_group_sample_num + 1;
             }
+
             /* map post */
             List<String> pcdFiles = results.stream()
                     .filter(path -> path.endsWith(".pcd"))
@@ -86,18 +103,17 @@ public class FtpService {
             Integer map_num = 0;
 
             for (String filePath : pcdFiles) {
-                Path filepath = Paths.get(filePath);
                 MapEntity mapEntity = MapEntity.builder()
-                        .mapPath("/hdd_ext/part6/sirius/"+ filepath.getParent())
+                        .mapDateEntity(mapDateEntity)
+                        .mapPath("/hdd_ext/part6/sirius/"+ filePath)
                         .mapCount(infoMapData.getNumberOfPointCloud())
                         .mapArea(infoMapData.getMapSize())
-//                        .mapGroupEntity(mapGroupEntity)
                         .build();
                 mapRepository.save(mapEntity).getId();
                 map_num = map_num + 1;
             }
-
-            return new BaseResponse(ErrorCode.SUCCESS, results);
+            String message = "총 "+String.valueOf(map_group_sample_num+map_num)+"개의 파일이 업로드 되었습니다.";
+            return new BaseResponse(ErrorCode.SUCCESS, message);
         } finally {
             ftpConfig.close(); // 항상 연결을 종료합니다.
         }

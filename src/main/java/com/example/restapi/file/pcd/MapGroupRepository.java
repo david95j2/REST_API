@@ -1,7 +1,6 @@
 package com.example.restapi.file.pcd;
 
 import com.example.restapi.file.pcd.domain.GetGroupInfoMapping;
-import com.example.restapi.file.pcd.domain.GetMapInfoMapping;
 import com.example.restapi.file.pcd.domain.MapGroupEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,5 +17,5 @@ public interface MapGroupRepository extends JpaRepository<MapGroupEntity, Intege
             "WHERE u.loginId=:login_id")
     List<GetGroupInfoMapping> findMapGroupByUserId(@Param("login_id") String login_id);
 
-
+    Optional<MapGroupEntity> findByLocation(String location);
 }

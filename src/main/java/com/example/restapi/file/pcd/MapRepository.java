@@ -1,11 +1,10 @@
 package com.example.restapi.file.pcd;
 
-import com.example.restapi.file.pcd.domain.*;
+import com.example.restapi.file.pcd.domain.GetMapInfoMapping;
+import com.example.restapi.file.pcd.domain.MapEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
-
 
 import java.util.List;
 import java.util.Optional;
