@@ -74,7 +74,7 @@ public class FtpService {
                 MapGroupSampleEntity mapGroupSampleEntity = MapGroupSampleEntity.builder()
                         .mapSamplePath("/hdd_ext/part6/sirius/"+filePath)
                         .mapSampleRegdate(Util.convertToMySQLFormat(postFileReq.getRegdate()))
-                        .mapGroupEntity(mapGroupEntity)
+//                        .mapGroupEntity(mapGroupEntity)
                         .build();
                 mapGroupSampleRepository.save(mapGroupSampleEntity).getId();
                 map_group_sample_num = map_group_sample_num + 1;
@@ -91,7 +91,7 @@ public class FtpService {
                         .mapPath("/hdd_ext/part6/sirius/"+ filepath.getParent())
                         .mapCount(infoMapData.getNumberOfPointCloud())
                         .mapArea(infoMapData.getMapSize())
-                        .mapGroupEntity(mapGroupEntity)
+//                        .mapGroupEntity(mapGroupEntity)
                         .build();
                 mapRepository.save(mapEntity).getId();
                 map_num = map_num + 1;

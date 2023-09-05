@@ -4,17 +4,12 @@ import com.example.restapi.exception.AppException;
 import com.example.restapi.exception.BaseResponse;
 import com.example.restapi.exception.ErrorCode;
 import com.example.restapi.file.image.domain.*;
-import com.example.restapi.file.pcd.domain.GetGroupPcdRes;
-import com.example.restapi.file.pcd.domain.MapEntity;
 import com.example.restapi.utils.Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,10 +21,16 @@ public class ImageService {
     private final ImageRepository imageRepository;
 
     @Transactional(readOnly = true)
-    public BaseResponse getImgList(Integer id, String login_id) {
-        List<GetImagesMapping> reulsts = imageRepository.findAllByMapIdAndLoginId(id, login_id);
+    public BaseResponse getImgList(Integer id) {
+        List<GetImageMapping> results = imageRepository.findAllByMapIdAndLoginId(id);
+        return new BaseResponse(ErrorCode.SUCCESS, results);
+    }
 
-        List<GetImagesRes> result = reulsts.stream()
+    @Transactional(readOnly = true)
+    public BaseResponse getGroupImgList(Integer map_id,Integer group_id) {
+        List<GetImagesMapping> results = imageRepository.findAllGroupByMapIdAndLoginId(map_id, group_id);
+
+        List<GetImagesRes> result = results.stream()
                 .map(mapping -> {
                     String fileName = Paths.get(mapping.getFileName()).getFileName().toString();
                     GetImagesRes getImagesRes = new GetImagesRes();
@@ -48,33 +49,9 @@ public class ImageService {
         return new BaseResponse(ErrorCode.SUCCESS, result);
     }
 
-//    @Transactional(readOnly = true)
-//    public BaseResponse getGroupImgList(Integer map_id,Integer group_id, String login_id) {
-//        List<GetGroupImagesMapping> getGroupImagesMappings = imageRepository.findAllGroupByMapIdAndLoginId(map_id, group_id, login_id);
-//        List<GetGroupImagesRes> result = getGroupImagesMappings.stream()
-//                .map(mapping -> {
-//                    String fileName = Paths.get(mapping.getImgPath()).getFileName().toString();
-//                    GetGroupImagesRes getGroupImagesRes = new GetGroupImagesRes();
-//                    getGroupImagesRes.setId(mapping.getId());
-//                    getGroupImagesRes.setImgName(fileName);
-//                    getGroupImagesRes.setRegdate(mapping.getRegdate());
-//                    return getGroupImagesRes;
-//                }).collect(Collectors.toList());
-//
-//        return new BaseResponse(ErrorCode.SUCCESS, result);
-//    }
 
-    public ResponseEntity getImgJson(Integer id, Integer img_id, String login_id) {
-        GetImageMapping getImageMapping = imageRepository.findByIdAndMapIdAndLoginId(img_id, id, login_id).orElseThrow(
-                () -> new AppException(ErrorCode.DATA_NOT_FOUND));
-
-        return new ResponseEntity(
-                new BaseResponse(ErrorCode.SUCCESS,getImageMapping)
-                ,ErrorCode.SUCCESS.getStatus());
-    }
-
-    public Resource getImg(Integer id, Integer img_id, String login_id) {
-        ImageEntity imageEntity = imageRepository.findPathByIdAndMapIdAndLoginId(img_id,id,login_id).orElseThrow(
+    public Resource getImg(Integer id, Integer img_id) {
+        ImageEntity imageEntity = imageRepository.findPathByIdAndMapIdAndLoginId(img_id,id).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOT_FOUND)
         );
         return Util.loadFileAsResource(Paths.get(imageEntity.getImgPath()).getParent().toString(),

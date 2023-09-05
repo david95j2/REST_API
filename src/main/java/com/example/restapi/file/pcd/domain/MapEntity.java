@@ -24,15 +24,15 @@ public class MapEntity {
 
     @JsonBackReference
     @ManyToOne
-    @JoinColumn(name = "map_group_id")
-    private MapGroupEntity mapGroupEntity;
+    @JoinColumn(name = "map_group_date_id")
+    private MapDateEntity mapDateEntity;
 
     public GetFileRes toGetFileRes() {
         GetFileRes getFileRes = new GetFileRes();
         getFileRes.setMap_count(this.mapCount);
         getFileRes.setMap_area(this.mapArea);
-        getFileRes.setFile_location(this.mapGroupEntity.getLocation());
-        getFileRes.setUser_loginId(this.mapGroupEntity.getUserEntity().getLoginId());
+        getFileRes.setFile_location(this.mapDateEntity.getMapGroupEntity().getLocation());
+        getFileRes.setUser_loginId(this.mapDateEntity.getMapGroupEntity().getUserEntity().getLoginId());
         return getFileRes;
     }
 }

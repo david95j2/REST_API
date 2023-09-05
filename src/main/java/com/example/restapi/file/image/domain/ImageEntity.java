@@ -34,7 +34,7 @@ public class ImageEntity {
 
     public GetImageRes toGetImageRes() {
         GetImageRes dto = new GetImageRes();
-        dto.setFile_location(this.imageGroupEntity.getMapGroupEntity().getLocation()); // Assuming this is the location
+        dto.setFile_location(this.imageGroupEntity.getMapEntity().getMapDateEntity().getMapGroupEntity().getLocation()); // Assuming this is the location
         dto.setFile_regdate(this.regdate);
 
         if(this.locationEntity != null) { // Assuming locationEntity could be null

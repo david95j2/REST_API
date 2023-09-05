@@ -29,8 +29,8 @@ public class ImageGroupEntity {
 
     @JsonBackReference
     @ManyToOne
-    @JoinColumn(name = "map_group_id")
-    private MapGroupEntity mapGroupEntity;
+    @JoinColumn(name = "map_id")
+    private MapEntity mapEntity;
 
     @JsonManagedReference
     @JsonIgnore

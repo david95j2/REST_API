@@ -26,6 +26,6 @@ public class MapGroupSampleEntity {
 
     @JsonBackReference
     @ManyToOne
-    @JoinColumn(name = "map_group_id")
-    private MapGroupEntity mapGroupEntity;
+    @JoinColumn(name = "map_group_date_id")
+    private MapDateEntity mapDateEntity;
 }

@@ -1,30 +1,21 @@
 package com.example.restapi.file.pcd;
 
-import com.example.restapi.configuration.FtpConfig;
 import com.example.restapi.exception.AppException;
 import com.example.restapi.exception.BaseResponse;
 import com.example.restapi.exception.ErrorCode;
-import com.example.restapi.file.image.domain.GetGroupImagesRes;
 import com.example.restapi.file.pcd.domain.*;
 import com.example.restapi.utils.Util;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.net.ftp.FTPClient;
 import org.json.simple.JSONObject;
 import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.io.FilterOutputStream;
-import java.io.IOException;
+import java.awt.print.Pageable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,79 +23,46 @@ import java.util.stream.Collectors;
 public class MapService {
     private final MapRepository mapRepository;
     private final MapGroupRepository mapGroupRepository;
+    private final MapDateRepository mapDateRepository;
     private final MapGroupSampleRepository mapGroupSampleRepository;
+
 
     // 해당 유저의 한에 전체 pcd 리스트 불러오기 -> O
     public BaseResponse getPcdList(String login_id) {
-        List<GetGroupInfoMapping> mapGroupInfos = mapGroupRepository.findMapGroupInfoByUserId(login_id);
-        List<Map<String, Object>> responseList = new ArrayList<>();
-
-        Map<String, List<GetGroupInfoMapping>> groupByLocation = mapGroupInfos.stream()
-                .collect(Collectors.groupingBy(GetGroupInfoMapping::getLocation));
-
-        groupByLocation.forEach((location, infos) -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("location", location);
-
-            if (infos.size() == 1) {
-                GetGroupInfoMapping info = infos.get(0);
-                map.put("id",info.getMapGroupId());
-                map.put("latitude", info.getLatitude());
-                map.put("longitude", info.getLongitude());
-                map.put("regdate", info.getRegdate().toString());
-            } else {
-                List<Map<String, Object>> dataCounts = new ArrayList<>();
-                for (GetGroupInfoMapping info : infos) {
-                    Map<String, Object> dataMap = new HashMap<>();
-                    dataMap.put("id",info.getMapGroupId());
-                    dataMap.put("latitude", info.getLatitude());
-                    dataMap.put("longitude", info.getLongitude());
-                    dataMap.put("regdate", info.getRegdate().toString());
-                    dataCounts.add(dataMap);
-                }
-                map.put("data_count", dataCounts);
-            }
-
-            responseList.add(map);
-        });
-
-        return new BaseResponse(ErrorCode.SUCCESS, responseList);
+        List<GetGroupInfoMapping> mapGroupInfos = mapGroupRepository.findMapGroupByUserId(login_id);
+        return new BaseResponse(ErrorCode.SUCCESS, mapGroupInfos);
     }
 
     @Transactional(readOnly = true)
-    public BaseResponse getGroupPcdList(String loginId, Integer mapGroupId) {
-        List<GetGroupListMapping> map_results = mapRepository.findAllByMapGroupIdAndLoginId(mapGroupId,loginId);
-        List<GetGroupPcdRes> result = map_results.stream()
+    public BaseResponse getGroupPcdList(Integer group_id) {
+        List<MapDateEntity> results = mapDateRepository.findAllByMapGroupIdAndLoginId(group_id);
+        List<JSONObject> result = results.stream()
+                .map(x -> {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("id",x.getId());
+                    jsonObject.put("regdate",x.getDate()+" "+x.getTime());
+                    return jsonObject;
+                }).collect(Collectors.toList());
+
+        return new BaseResponse(ErrorCode.SUCCESS, result);
+    }
+
+    public BaseResponse getPcdListByDate(Integer map_group_id, Integer map_date_id) {
+        List<MapEntity> results = mapRepository.findAllByGroupIdAndDateId(map_group_id, map_date_id);
+
+        List<GetPcdListRes> result = results.stream()
                 .map(mapping -> {
-                    String fileName = Paths.get(mapping.getFileName()).getFileName().toString();
-                    GetGroupPcdRes getGroupPcdRes = new GetGroupPcdRes();
-                    getGroupPcdRes.setId(mapping.getPcdId());
-                    getGroupPcdRes.setFile_name(fileName);
-                    getGroupPcdRes.setRegdate(mapping.getRegdate());
-                    return getGroupPcdRes;
+                    String file_name = Paths.get(mapping.getMapPath()).getFileName().toString();
+                    GetPcdListRes getPcdListRes = new GetPcdListRes();
+                    getPcdListRes.setId(mapping.getId());
+                    getPcdListRes.setFile_name(file_name);
+                    return getPcdListRes;
                 }).collect(Collectors.toList());
         return new BaseResponse(ErrorCode.SUCCESS, result);
     }
 
-    @Transactional(readOnly = true)
-    public ResponseEntity getPcdJson(Integer id, String login_id) {
-        GetMapJsonMapping getMapJsonMapping = mapRepository.findDetailByIdAndLoginId(id, login_id).orElseThrow(
-                () -> new AppException(ErrorCode.DATA_NOT_FOUND));
-        JSONObject result = new JSONObject();
-        result.put("file_name",new File(getMapJsonMapping.getFileName()).getName());
-        result.put("location",getMapJsonMapping.getLocation());
-        result.put("count",getMapJsonMapping.getCount());
-        result.put("area",getMapJsonMapping.getArea());
-        result.put("regdate",getMapJsonMapping.getRegdate());
-
-
-        return new ResponseEntity(
-                new BaseResponse(ErrorCode.SUCCESS, result)
-                ,ErrorCode.SUCCESS.getStatus());
-    }
-
-    public Resource getPcd(Integer id, String login_id) {
-        GetMapInfoMapping getMapInfoMapping = mapRepository.findByIdAndLoginId(id, login_id).orElseThrow(
+    public Resource getPcd(Integer id) {
+        GetMapInfoMapping getMapInfoMapping = mapRepository.findByIdAndLoginId(id).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOT_FOUND)
         );
 
@@ -112,13 +70,11 @@ public class MapService {
                 String.valueOf(Paths.get(getMapInfoMapping.getFileName()).getFileName()));
     }
 
-    public Resource getPcdSample(Integer id, String login_id) {
-        MapSampleMapping result = mapRepository.findSampleByIdAndLoginId(id, login_id).orElseThrow(
+    public Resource getPcdSample(Integer id) {
+        PageRequest pageRequest = PageRequest.of(0,1);
+        MapSampleMapping result = mapGroupSampleRepository.findSampleById(id,pageRequest).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOT_FOUND));
-
-        return Util.loadFileAsResource(Path.of(result.getPcdSamplePath()).getParent().toString().replace("\\","/"),
-                Path.of(result.getPcdSamplePath()).getFileName().toString());
+        return Util.loadFileAsResource(Path.of(result.getFileName()).getParent().toString().replace("\\","/"),
+                Path.of(result.getFileName()).getFileName().toString());
     }
-
-
 }
