@@ -37,6 +37,7 @@ public enum ErrorCode {
     DATA_NOT_FOUND(HttpStatus.NOT_FOUND, "데이터가 존재하지 않습니다."),
     INCORRECT(HttpStatus.NOT_FOUND, "비밀번호가 틀립니다."),
     NOT_NULL(HttpStatus.NOT_FOUND,"빈칸을 채워주십시오."),
+    FTP_DATA_NOT_FOUND(HttpStatus.NOT_FOUND,"데이터를 확인할 수 없습니다. FTP URL 경로를 다시 확인해주세요."),
 
     /*
      * 405 METHOD_NOT_ALLOWED: 허용되지 않은 Request Method 호출

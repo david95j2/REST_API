@@ -185,7 +185,7 @@ public class Util {
                             infoMapData.setNumberOfPointCloud(Integer.parseInt(value));
                             break;
                         case "map size":
-                            infoMapData.setMapSize(Integer.parseInt(value));
+                            infoMapData.setMapSize((int) Float.parseFloat(value));
                             break;
                         case "x":
                             infoMapData.setX(Float.parseFloat(value));

@@ -56,7 +56,7 @@ public class FtpService {
         try {
             List<String> results = Util.listFilesInDirectory(ftpClient,url+"/pcd");
             if (results.isEmpty()) {
-                return new BaseResponse(ErrorCode.DATA_NOT_FOUND);
+                return new BaseResponse(ErrorCode.FTP_DATA_NOT_FOUND,url);
             }
             UserEntity userEntity = userRepository.findById(user_id).orElseThrow(()-> new AppException(ErrorCode.NOT_FOUND));
             /* infoMap.txt -> Dto */
@@ -87,10 +87,13 @@ public class FtpService {
 
             Integer map_group_sample_num = 0;
             for (String filePath : sampleFiles) {
+                Path path = Paths.get(filePath);
+//                System.out.println(new StringBuilder().append(path.getFileName().toString().split("_")[0]).append("_").append(path.getFileName().toString().split("_")[1].toString()));
+
                 MapGroupSampleEntity mapGroupSampleEntity = MapGroupSampleEntity.builder()
                         .mapDateEntity(mapDateEntity)
                         .mapSamplePath("/hdd_ext/part6/sirius/"+filePath)
-                        .mapSampleRegdate(Util.convertToMySQLFormat(postFileReq.getRegdate()))
+                        .mapSampleRegdate(Util.convertToMySQLFormat(path.getFileName().toString().split("_")[0]+"_"+path.getFileName().toString().split("_")[1]))
                         .build();
                 mapGroupSampleRepository.save(mapGroupSampleEntity).getId();
                 map_group_sample_num = map_group_sample_num + 1;
