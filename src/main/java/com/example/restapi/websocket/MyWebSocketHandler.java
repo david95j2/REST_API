@@ -103,7 +103,9 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
             sess.sendMessage(message);
         }
 
-        log.info(String.valueOf(session.getUri()));
+//        log.info(String.valueOf(session.getUri()));
+        log.info(payload);
+        System.out.println(payload);
     }
 
     /* Client가 접속 시 호출되는 메서드 */

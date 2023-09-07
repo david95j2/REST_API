@@ -68,9 +68,9 @@ public class FileController {
         return Util.getFile(file, true);
     }
 
-    @GetMapping("api/{login_id}/pcd/{pcd_id}/images")
+    @GetMapping("api/{login_id}/pcd/{date_id}/images")
     @ResponseBody
-    public BaseResponse getImageList(@PathVariable("login_id") String login_id,@PathVariable("pcd_id") Integer id) {
+    public BaseResponse getImageList(@PathVariable("login_id") String login_id,@PathVariable("date_id") Integer id) {
         userService.getUserByLoginId(login_id);
         return imageService.getImgList(id);
     }

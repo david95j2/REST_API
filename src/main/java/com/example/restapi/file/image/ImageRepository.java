@@ -15,24 +15,24 @@ public interface ImageRepository extends JpaRepository<ImageEntity, Integer> {
     @Query("select i "+
             "from ImageEntity i " +
             "join i.imageGroupEntity ig join i.locationEntity il " +
-            "join ig.mapEntity m join m.mapDateEntity md join md.mapGroupEntity mg join mg.userEntity u " +
+            "join ig.mapDateEntity md join md.mapGroupEntity mg join mg.userEntity u " +
             "where i.id=:img_id")
     Optional<ImageEntity> findPathByIdAndMapIdAndLoginId(@Param("img_id") int img_id);
 
     @Query("select ig.id as id, ig.imgGroupName as groupName, count (*) as count," +
             " mg.location as location, ig.imgGroupRegdate as regdate " +
             "from ImageEntity i " +
-            "join i.imageGroupEntity ig join ig.mapEntity m join m.mapDateEntity md " +
+            "join i.imageGroupEntity ig join ig.mapDateEntity md " +
             "join md.mapGroupEntity mg join mg.userEntity u " +
-            "where m.id=:map_id " +
+            "where md.id=:date_id " +
             "group by i.imageGroupEntity.id, mg.location")
-    List<GetImageMapping> findAllByMapIdAndLoginId(@Param("map_id") int map_id);
+    List<GetImageMapping> findAllByMapIdAndLoginId(@Param("date_id") int date_id);
 
 
     @Query("select i.id as id, i.imgPath as fileName, i.regdate as regdate, " +
             "il.posX as posX, il.posY as posY, il.posZ as posZ, il.roll as roll, il.pitch as pitch, il.yaw as yaw " +
             "from ImageEntity i join i.locationEntity il " +
-            "join i.imageGroupEntity ig join ig.mapEntity m join m.mapDateEntity md " +
+            "join i.imageGroupEntity ig join ig.mapDateEntity md " +
             "join md.mapGroupEntity mg join mg.userEntity u " +
             "where ig.id=:group_id")
     List<GetImagesMapping> findAllGroupByMapIdAndLoginId(@Param("group_id")int group_id);

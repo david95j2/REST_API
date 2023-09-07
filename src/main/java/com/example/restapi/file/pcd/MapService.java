@@ -33,14 +33,15 @@ public class MapService {
         return new BaseResponse(ErrorCode.SUCCESS, mapGroupInfos);
     }
 
-    @Transactional(readOnly = true)
+
     public BaseResponse getGroupPcdList(Integer group_id) {
-        List<MapDateEntity> results = mapDateRepository.findAllByMapGroupIdAndLoginId(group_id);
+        List<GetDateMapping> results = mapDateRepository.findAllByMapGroupIdAndLoginId(group_id, "GlobalMap.pcd");
         List<JSONObject> result = results.stream()
                 .map(x -> {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("id",x.getId());
                     jsonObject.put("regdate",x.getDate()+" "+x.getTime());
+                    jsonObject.put("global_id",x.getPcdId());
                     return jsonObject;
                 }).collect(Collectors.toList());
 
