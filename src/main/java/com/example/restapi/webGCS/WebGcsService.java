@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -32,22 +34,19 @@ public class WebGcsService {
         return new BaseResponse(ErrorCode.SUCCESS,missionRepository.save(missionEntity).getId());
     }
 
-    public BaseResponse deleteMission(Integer mission_id, Integer user_id) {
-        MissionEntity missionEntity = missionRepository.findByIdAndUserEntityId(mission_id, user_id)
+    public BaseResponse deleteMission(Integer mission_id) {
+        MissionEntity missionEntity = missionRepository.findById(mission_id)
                 .orElseThrow(()->new AppException(ErrorCode.DATA_NOT_FOUND));
         // waypoint가 있으면 먼저 삭제
-        Integer delete_waypoint_num = wayPointRepository.deleteALLByUserIdAndMissionId(mission_id, user_id);
+        Integer delete_waypoint_num = wayPointRepository.deleteALLByMissionId(mission_id);
 
-        Integer delete_mission_id = missionRepository.deleteByIdAndUserEntityId(mission_id, user_id);
-        if (delete_mission_id == 0) {
-            return new BaseResponse(ErrorCode.DATA_NOT_FOUND);
-        }
+        missionRepository.delete(missionEntity);
 
         return new BaseResponse(ErrorCode.SUCCESS, missionEntity.getMissionName()+" 데이터가 삭제되었습니다.");
     }
 
-    public BaseResponse getWayPointList(Integer user_id, Integer missionId) {
-        return new BaseResponse(ErrorCode.SUCCESS, wayPointRepository.findAllByMissionIdAndLoginId(missionId,user_id));
+    public BaseResponse getWayPointList(Integer mission_id) {
+        return new BaseResponse(ErrorCode.SUCCESS, wayPointRepository.findAllByMissionId(mission_id));
     }
 
     public BaseResponse postWayPoint(Integer missionId, PostWayPointReq postWayPointReq) {
@@ -64,15 +63,13 @@ public class WebGcsService {
         return new BaseResponse(ErrorCode.SUCCESS,id);
     }
 
-    public BaseResponse deleteWayPoint(Integer mission_id, Integer waypoint_id, Integer user_id) {
+    public BaseResponse deleteWayPoint(Integer waypoint_id) {
         /* mission_id 와 seq 를 조회해서 seq가 중간에 들어올 시 update해야 함.*/
         WayPointEntity wayPointEntity = wayPointRepository.findById(waypoint_id).orElseThrow(()->new AppException(ErrorCode.DATA_NOT_FOUND));
-        wayPointRepository.decrementSeqGreaterThan(mission_id, wayPointEntity.getSeq());
+        wayPointRepository.decrementSeqGreaterThan(wayPointEntity.getMissionEntity().getId(), wayPointEntity.getSeq());
 
-        Integer delete_mission_id = wayPointRepository.deleteByIdAndUserIdAndMissionId(waypoint_id,mission_id,user_id);
-        if (delete_mission_id == 0) {
-            return new BaseResponse(ErrorCode.DATA_NOT_FOUND);
-        }
+        wayPointRepository.delete(wayPointEntity);
+
         return new BaseResponse(ErrorCode.SUCCESS, String.valueOf(waypoint_id)+"번 Waypoint가 삭제되었습니다.");
     }
 
@@ -80,8 +77,8 @@ public class WebGcsService {
         return new BaseResponse(ErrorCode.SUCCESS, droneRepository.findAllByLoginId(loginId));
     }
 
-    public BaseResponse getDrone(Integer user_id, Integer drone_id) {
-        DroneEntity droneEntity = droneRepository.findByIdAndUserEntityId(drone_id,user_id).orElseThrow(
+    public BaseResponse getDrone(Integer drone_id) {
+        DroneEntity droneEntity = droneRepository.findById(drone_id).orElseThrow(
                 ()-> new AppException(ErrorCode.DATA_NOT_FOUND)
         );
 
@@ -89,11 +86,34 @@ public class WebGcsService {
     }
 
     public BaseResponse putDrone(PutDroneReq putDroneReq) {
-        Integer update_drone_num = droneRepository.updateVoltage(putDroneReq.getDrone_id(),putDroneReq.getDrone_voltage_min(),
-                putDroneReq.getDrone_voltage_max(),putDroneReq.getUser_id());
-        if (update_drone_num == 0) {
-            return new BaseResponse(ErrorCode.DATA_NOT_FOUND);
+        DroneEntity droneEntity = droneRepository.findById(putDroneReq.getDrone_id()).orElseThrow(() -> new AppException(ErrorCode.DATA_NOT_FOUND));
+
+        if (putDroneReq.getDrone_name() != null) {
+            droneEntity.setDroneType(putDroneReq.getDrone_name());
         }
+        if (putDroneReq.getDrone_voltage_min() != null) {
+            droneEntity.setDroneVoltageMin(putDroneReq.getDrone_voltage_min());
+        }
+        if (putDroneReq.getDrone_voltage_max() != null) {
+            droneEntity.setDroneVoltageMax(putDroneReq.getDrone_voltage_max());
+        }
+        droneRepository.save(droneEntity);
+
         return new BaseResponse(ErrorCode.SUCCESS, String.valueOf(putDroneReq.getDrone_id())+"번 Voltage값이 수정되었습니다.");
+    }
+
+    public BaseResponse postDrone(PostDroneReq postDroneReq, Integer user_id) {
+        UserEntity userEntity = userRepository.findById(user_id).orElseThrow(
+                () -> new AppException(ErrorCode.NOT_FOUND));
+
+        DroneEntity droneEntity = DroneEntity.builder()
+                .droneType(postDroneReq.getDrone_name())
+                .droneVoltageMin(postDroneReq.getDrone_voltage_min())
+                .droneVoltageMax(postDroneReq.getDrone_voltage_max())
+                .userEntity(userEntity)
+                .build();
+
+        droneRepository.save(droneEntity).getId();
+        return new BaseResponse(ErrorCode.SUCCESS, postDroneReq.getDrone_name()+" 드론이 추가되었습니다.");
     }
 }

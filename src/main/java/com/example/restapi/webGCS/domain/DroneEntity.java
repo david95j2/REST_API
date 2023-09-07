@@ -16,9 +16,9 @@ public class DroneEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Column(name = "drone_voltage_min")
-    private float droneVoltageMin;
+    private Float droneVoltageMin;
     @Column(name = "drone_voltage_max")
-    private float droneVoltageMax;
+    private Float droneVoltageMax;
     @Column(name = "drone_type")
     private String droneType;
 

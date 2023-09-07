@@ -35,7 +35,7 @@ public class MapService {
 
 
     public BaseResponse getGroupPcdList(Integer group_id) {
-        List<GetDateMapping> results = mapDateRepository.findAllByMapGroupIdAndLoginId(group_id, "GlobalMap.pcd");
+        List<GetDateMapping> results = mapDateRepository.findAllAndPcdIdByMapGroupId(group_id, "GlobalMap.pcd");
         List<JSONObject> result = results.stream()
                 .map(x -> {
                     JSONObject jsonObject = new JSONObject();
@@ -71,9 +71,9 @@ public class MapService {
                 String.valueOf(Paths.get(getMapInfoMapping.getFileName()).getFileName()));
     }
 
-    public Resource getPcdSample(Integer id) {
+    public Resource getPcdSample(Integer pcd_group_id) {
         PageRequest pageRequest = PageRequest.of(0,1);
-        MapSampleMapping result = mapGroupSampleRepository.findSampleById(id,pageRequest).orElseThrow(
+        MapSampleMapping result = mapGroupSampleRepository.findSampleById(pcd_group_id,pageRequest).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOT_FOUND));
         return Util.loadFileAsResource(Path.of(result.getFileName()).getParent().toString().replace("\\","/"),
                 Path.of(result.getFileName()).getFileName().toString());

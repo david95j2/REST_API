@@ -16,12 +16,10 @@ public interface DroneRepository extends JpaRepository<DroneEntity, Integer> {
             "join d.userEntity u where u.loginId=:login_id")
     List<DroneEntity> findAllByLoginId(@Param("login_id") String loginId);
 
-    Optional<DroneEntity> findByIdAndUserEntityId(Integer drone_id, Integer user_id);
-
-    @Transactional
-    @Modifying
-    @Query("update DroneEntity d set d.droneVoltageMin=:droneVoltageMin, d.droneVoltageMax=:droneVoltageMax " +
-            "where d.id=:drone_id and d.userEntity.id=:user_id")
-    Integer updateVoltage(@Param("drone_id") Integer drone_id, @Param("droneVoltageMin") float droneVoltageMin,
-                       @Param("droneVoltageMax") float droneVoltageMax,@Param("user_id") Integer user_id);
+//    @Transactional
+//    @Modifying
+//    @Query("update DroneEntity d set d.droneVoltageMin=:droneVoltageMin, d.droneVoltageMax=:droneVoltageMax " +
+//            "where d.id=:drone_id")
+//    Integer updateVoltage(@Param("drone_id") Integer drone_id, @Param("droneVoltageMin") float droneVoltageMin,
+//                       @Param("droneVoltageMax") float droneVoltageMax);
 }

@@ -2,6 +2,7 @@ package com.example.restapi.webGCS;
 
 import com.example.restapi.exception.BaseResponse;
 import com.example.restapi.user.UserService;
+import com.example.restapi.webGCS.domain.PostDroneReq;
 import com.example.restapi.webGCS.domain.PostMissionReq;
 import com.example.restapi.webGCS.domain.PostWayPointReq;
 import com.example.restapi.webGCS.domain.PutDroneReq;
@@ -24,19 +25,22 @@ public class WebGcsController {
         return webGcsService.getDroneList(login_id);
     }
 
-    @GetMapping("api/{login_id}/drone/{drone_id}")
+    @GetMapping("api/drone/{drone_id}")
     @ResponseBody
-    public BaseResponse getDrone(@PathVariable("login_id") String login_id, @PathVariable("drone_id") Integer drone_id) {
-        Integer user_id = userService.getUserByLoginId(login_id);
-        return webGcsService.getDrone(user_id,drone_id);
+    public BaseResponse getDrone(@PathVariable("drone_id") Integer drone_id) {
+        return webGcsService.getDrone(drone_id);
     }
 
-    @PutMapping("api/{login_id}/drone/{drone_id}")
+    @PostMapping("api/{login_id}/drone")
     @ResponseBody
-    public BaseResponse putDrone(@PathVariable("login_id") String login_id, @PathVariable("drone_id") Integer drone_id,
-                                 @Valid @RequestBody PutDroneReq putDroneReq) {
+    public BaseResponse postDrone(@PathVariable("login_id") String login_id ,@Valid @RequestBody PostDroneReq postDroneReq) {
         Integer user_id = userService.getUserByLoginId(login_id);
-        putDroneReq.setUser_id(user_id);
+        return webGcsService.postDrone(postDroneReq,user_id);
+    }
+
+    @PatchMapping("api/drone/{drone_id}")
+    @ResponseBody
+    public BaseResponse putDrone(@PathVariable("drone_id") Integer drone_id,@RequestBody PutDroneReq putDroneReq) {
         putDroneReq.setDrone_id(drone_id);
         return webGcsService.putDrone(putDroneReq);
     }
@@ -56,33 +60,27 @@ public class WebGcsController {
         return webGcsService.postMission(postMissionReq);
     }
 
-    @DeleteMapping("api/{login_id}/mission/{mission_id}")
+    @DeleteMapping("api/mission/{mission_id}")
     @ResponseBody
-    public BaseResponse deleteMission(@PathVariable("login_id") String login_id, @PathVariable("mission_id") Integer mission_id) {
-        Integer user_id = userService.getUserByLoginId(login_id);
-        return webGcsService.deleteMission(mission_id, user_id);
+    public BaseResponse deleteMission(@PathVariable("mission_id") Integer mission_id) {
+        return webGcsService.deleteMission(mission_id);
     }
 
-    @GetMapping("api/{login_id}/mission/{mission_id}/waypoints")
+    @GetMapping("api/mission/{mission_id}/waypoints")
     @ResponseBody
-    public BaseResponse getWayPointList(@PathVariable("login_id") String login_id, @PathVariable("mission_id") Integer mission_id) {
-        Integer user_id = userService.getUserByLoginId(login_id);
-        return webGcsService.getWayPointList(user_id, mission_id);
+    public BaseResponse getWayPointList(@PathVariable("mission_id") Integer mission_id) {
+        return webGcsService.getWayPointList(mission_id);
     }
 
-    @PostMapping("api/{login_id}/mission/{mission_id}/waypoint")
+    @PostMapping("api/mission/{mission_id}/waypoint")
     @ResponseBody
-    public BaseResponse postWayPoint(@PathVariable("login_id") String login_id, @PathVariable("mission_id") Integer mission_id,
-                                     @Valid @RequestBody PostWayPointReq postWayPointReq) {
-        userService.getUserByLoginId(login_id);
+    public BaseResponse postWayPoint(@PathVariable("mission_id") Integer mission_id, @Valid @RequestBody PostWayPointReq postWayPointReq) {
         return webGcsService.postWayPoint(mission_id, postWayPointReq);
     }
 
-    @DeleteMapping("api/{login_id}/mission/{mission_id}/waypoint/{waypoint_id}")
+    @DeleteMapping("api/mission/waypoint/{waypoint_id}")
     @ResponseBody
-    public BaseResponse deleteWayPoint(@PathVariable("login_id") String login_id,@PathVariable("mission_id") Integer mission_id,
-                                       @PathVariable("waypoint_id") Integer waypoint_id) {
-        Integer user_id = userService.getUserByLoginId(login_id);
-        return webGcsService.deleteWayPoint(mission_id,waypoint_id,user_id);
+    public BaseResponse deleteWayPoint(@PathVariable("waypoint_id") Integer waypoint_id) {
+        return webGcsService.deleteWayPoint(waypoint_id);
     }
 }

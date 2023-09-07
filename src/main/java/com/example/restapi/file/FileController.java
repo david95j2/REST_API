@@ -36,65 +36,52 @@ public class FileController {
         return mapService.getPcdList(login_id);
     }
 
-    @GetMapping("api/{login_id}/pcds/{pcd_group_id}")
+    @GetMapping("api/pcds/{pcd_group_id}")
     @ResponseBody
-    public BaseResponse getPcdDateList(@PathVariable("login_id") String login_id, @PathVariable("pcd_group_id") Integer map_group_id) {
-        userService.getUserByLoginId(login_id);
+    public BaseResponse getPcdDateList(@PathVariable("pcd_group_id") Integer map_group_id) {
         return mapService.getGroupPcdList(map_group_id);
     }
 
-    @GetMapping("api/{login_id}/pcds/{pcd_group_id}/dates/{pcd_date_id}")
+    @GetMapping("api/pcds/{pcd_group_id}/dates/{pcd_date_id}")
     @ResponseBody
-    public BaseResponse getPcdList(@PathVariable("login_id") String login_id,
-                                   @PathVariable("pcd_group_id") Integer map_group_id, @PathVariable("pcd_date_id") Integer map_date_id) {
-        userService.getUserByLoginId(login_id);
+    public BaseResponse getPcdList(@PathVariable("pcd_group_id") Integer map_group_id, @PathVariable("pcd_date_id") Integer map_date_id) {
         return mapService.getPcdListByDate(map_group_id, map_date_id);
     }
 
 
-    @GetMapping("api/{login_id}/pcd/{pcd_id}")
-    public ResponseEntity<InputStreamResource> getPcd(
-            @PathVariable("login_id") String login_id,@PathVariable("pcd_id") Integer id) throws IOException {
-        userService.getUserByLoginId(login_id);
+    @GetMapping("api/pcd/{pcd_id}")
+    public ResponseEntity<InputStreamResource> getPcd(@PathVariable("pcd_id") Integer id) throws IOException {
         Resource file = mapService.getPcd(id);
         return Util.getFile(file, false);
     }
 
-    @GetMapping("api/{login_id}/pcds/{pcd_id}/sample")
-    public ResponseEntity<InputStreamResource> getPcdSample(
-            @PathVariable("login_id") String login_id,@PathVariable("pcd_id") Integer id) throws IOException {
-        userService.getUserByLoginId(login_id);
+    @GetMapping("api/pcds/{pcd_group_id}/sample")
+    public ResponseEntity<InputStreamResource> getPcdSample(@PathVariable("pcd_group_id") Integer id) throws IOException {
         Resource file = mapService.getPcdSample(id);
         return Util.getFile(file, true);
     }
 
-    @GetMapping("api/{login_id}/pcd/{date_id}/images")
+    @GetMapping("api/pcds/{date_id}/images")
     @ResponseBody
-    public BaseResponse getImageList(@PathVariable("login_id") String login_id,@PathVariable("date_id") Integer id) {
-        userService.getUserByLoginId(login_id);
+    public BaseResponse getImageList(@PathVariable("date_id") Integer id) {
         return imageService.getImgList(id);
     }
 
-    @GetMapping("api/{login_id}/images/{group_id}")
+    @GetMapping("api/images/{group_id}")
     @ResponseBody
-    public BaseResponse getGroupImageList(
-            @PathVariable("login_id") String login_id, @PathVariable("group_id") Integer group_id) {
-        userService.getUserByLoginId(login_id);
+    public BaseResponse getGroupImageList(@PathVariable("group_id") Integer group_id) {
         return imageService.getGroupImgList(group_id);
     }
 
-    @GetMapping("api/{login_id}/image/{img_id}")
-    public ResponseEntity getImage(@PathVariable("login_id") String login_id, @PathVariable("img_id") int img_id) throws IOException {
-        userService.getUserByLoginId(login_id);
+    @GetMapping("api/image/{img_id}")
+    public ResponseEntity getImage(@PathVariable("img_id") int img_id) throws IOException {
         Resource file = imageService.getImg(img_id);
         return Util.getFile(file, false);
     }
 
-    @GetMapping("api/{login_id}/image/{img_id}/sample")
-    public ResponseEntity getSampleImage(@PathVariable("login_id") String login_id,@PathVariable("img_id") int img_id) throws IOException {
-        userService.getUserByLoginId(login_id);
+    @GetMapping("api/image/{img_id}/sample")
+    public ResponseEntity getSampleImage(@PathVariable("img_id") int img_id) throws IOException {
         Resource file = imageService.getImg(img_id);
-
         return Util.getFile(file, true);
     }
 }
