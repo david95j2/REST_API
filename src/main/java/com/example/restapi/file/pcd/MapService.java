@@ -10,9 +10,7 @@ import org.json.simple.JSONObject;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.print.Pageable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -28,14 +26,17 @@ public class MapService {
 
 
     // 해당 유저의 한에 전체 pcd 리스트 불러오기 -> O
-    public BaseResponse getPcdList(String login_id) {
+    public BaseResponse getGroupList(String login_id) {
         List<GetGroupInfoMapping> mapGroupInfos = mapGroupRepository.findMapGroupByUserId(login_id);
         return new BaseResponse(ErrorCode.SUCCESS, mapGroupInfos);
     }
 
+    public BaseResponse getGroup(Integer pcdGroupId) {
+        return new BaseResponse(ErrorCode.SUCCESS, mapGroupRepository.findById(pcdGroupId).orElseThrow(()-> new AppException(ErrorCode.DATA_NOT_FOUND)));
+    }
 
-    public BaseResponse getGroupPcdList(Integer group_id) {
-        List<GetDateMapping> results = mapDateRepository.findAllAndPcdIdByMapGroupId(group_id, "GlobalMap.pcd");
+    public BaseResponse getDateList(Integer pcd_group_id) {
+        List<GetDateMapping> results = mapDateRepository.findAllAndPcdIdByMapGroupId(pcd_group_id, "GlobalMap.pcd");
         List<JSONObject> result = results.stream()
                 .map(x -> {
                     JSONObject jsonObject = new JSONObject();
@@ -48,8 +49,13 @@ public class MapService {
         return new BaseResponse(ErrorCode.SUCCESS, result);
     }
 
-    public BaseResponse getPcdListByDate(Integer map_group_id, Integer map_date_id) {
-        List<MapEntity> results = mapRepository.findAllByGroupIdAndDateId(map_group_id, map_date_id);
+    public BaseResponse getDate(Integer pcdDateId) {
+        return new BaseResponse(ErrorCode.SUCCESS, mapDateRepository.findById(pcdDateId).orElseThrow(() -> new AppException(ErrorCode.DATA_NOT_FOUND)));
+    }
+
+    public BaseResponse getPcdInfoList(Integer map_date_id) {
+
+        List<MapEntity> results = mapRepository.findAllByGroupIdAndDateId(map_date_id);
 
         List<GetPcdListRes> result = results.stream()
                 .map(mapping -> {
@@ -77,5 +83,16 @@ public class MapService {
                 () -> new AppException(ErrorCode.DATA_NOT_FOUND));
         return Util.loadFileAsResource(Path.of(result.getFileName()).getParent().toString().replace("\\","/"),
                 Path.of(result.getFileName()).getFileName().toString());
+    }
+
+
+
+    public BaseResponse getPcdInfo(Integer pcdId) {
+        MapEntity mapEntity = mapRepository.findById(pcdId).orElseThrow(()->new AppException(ErrorCode.DATA_NOT_FOUND));
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("file_name",Paths.get(mapEntity.getMapPath()).getFileName().toString());
+        jsonObject.put("count",mapEntity.getMapCount());
+        jsonObject.put("area",mapEntity.getMapArea());
+        return new BaseResponse(ErrorCode.SUCCESS, jsonObject);
     }
 }

@@ -33,21 +33,38 @@ public class FileController {
     @ResponseBody
     public BaseResponse getGroupList(@PathVariable("login_id") String login_id) {
         userService.getUserByLoginId(login_id);
-        return mapService.getPcdList(login_id);
+        return mapService.getGroupList(login_id);
     }
 
     @GetMapping("api/pcds/{pcd_group_id}")
     @ResponseBody
-    public BaseResponse getPcdDateList(@PathVariable("pcd_group_id") Integer map_group_id) {
-        return mapService.getGroupPcdList(map_group_id);
+    public BaseResponse getGroup(@PathVariable("pcd_group_id") Integer pcd_group_id) {
+        return mapService.getGroup(pcd_group_id);
     }
 
-    @GetMapping("api/pcds/{pcd_group_id}/dates/{pcd_date_id}")
+    @GetMapping("api/pcds/{pcd_group_id}/dates")
     @ResponseBody
-    public BaseResponse getPcdList(@PathVariable("pcd_group_id") Integer map_group_id, @PathVariable("pcd_date_id") Integer map_date_id) {
-        return mapService.getPcdListByDate(map_group_id, map_date_id);
+    public BaseResponse getPcdDateList(@PathVariable("pcd_group_id") Integer pcd_group_id) {
+        return mapService.getDateList(pcd_group_id);
     }
 
+    @GetMapping("api/pcds/dates/{pcd_date_id}")
+    @ResponseBody
+    public BaseResponse getDate(@PathVariable("pcd_date_id") Integer pcd_date_id) {
+        return mapService.getDate(pcd_date_id);
+    }
+
+    @GetMapping("api/pcds/dates/{pcd_date_id}/info")
+    @ResponseBody
+    public BaseResponse getPcdInfoList(@PathVariable("pcd_date_id") Integer map_date_id) {
+        return mapService.getPcdInfoList(map_date_id);
+    }
+
+    @GetMapping("api/pcds/dates/info/{pcd_id}")
+    @ResponseBody
+    public BaseResponse getPcdInfo(@PathVariable("pcd_id") Integer pcd_id) {
+        return mapService.getPcdInfo(pcd_id);
+    }
 
     @GetMapping("api/pcd/{pcd_id}")
     public ResponseEntity<InputStreamResource> getPcd(@PathVariable("pcd_id") Integer id) throws IOException {
@@ -61,25 +78,25 @@ public class FileController {
         return Util.getFile(file, true);
     }
 
-    @GetMapping("api/pcds/{date_id}/images")
+    @GetMapping("api/pcds/dates/{pcd_date_id}/images")
     @ResponseBody
-    public BaseResponse getImageList(@PathVariable("date_id") Integer id) {
+    public BaseResponse getImageList(@PathVariable("pcd_date_id") Integer id) {
         return imageService.getImgList(id);
     }
 
-    @GetMapping("api/images/{group_id}")
+    @GetMapping("api/pcds/dates/images/{img_group_id}")
     @ResponseBody
-    public BaseResponse getGroupImageList(@PathVariable("group_id") Integer group_id) {
-        return imageService.getGroupImgList(group_id);
+    public BaseResponse getGroupImageList(@PathVariable("img_group_id") Integer img_group_id) {
+        return imageService.getGroupImgList(img_group_id);
     }
 
-    @GetMapping("api/image/{img_id}")
+    @GetMapping("api/pcd/image/{img_id}")
     public ResponseEntity getImage(@PathVariable("img_id") int img_id) throws IOException {
         Resource file = imageService.getImg(img_id);
         return Util.getFile(file, false);
     }
 
-    @GetMapping("api/image/{img_id}/sample")
+    @GetMapping("api/pcd/image/{img_id}/sample")
     public ResponseEntity getSampleImage(@PathVariable("img_id") int img_id) throws IOException {
         Resource file = imageService.getImg(img_id);
         return Util.getFile(file, true);

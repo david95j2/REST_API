@@ -15,4 +15,6 @@ public interface MapDateRepository extends JpaRepository<MapDateEntity, Integer>
             "join md.mapEntities m join md.mapGroupEntity mg join mg.userEntity u " +
             "where mg.id=:map_group_id and m.mapPath like %:file_name%")
     List<GetDateMapping> findAllAndPcdIdByMapGroupId(@Param("map_group_id") Integer map_group_id, @Param("file_name") String file_name);
+
+
 }

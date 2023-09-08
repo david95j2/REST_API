@@ -21,6 +21,6 @@ public interface MapRepository extends JpaRepository<MapEntity, Integer> {
     @Query("select m " +
             "from MapEntity m " +
             "join m.mapDateEntity md join md.mapGroupEntity mg join mg.userEntity u " +
-            "where md.id=:pcd_date_id and mg.id=:pcd_group_id")
-    List<MapEntity> findAllByGroupIdAndDateId(@Param("pcd_group_id") Integer map_group_id,@Param("pcd_date_id") Integer map_date_id);
+            "where md.id=:pcd_date_id")
+    List<MapEntity> findAllByGroupIdAndDateId(@Param("pcd_date_id") Integer map_date_id);
 }
